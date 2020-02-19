@@ -66,6 +66,7 @@ namespace DaRT
 		private ContextMenuStrip consoleContextMenu;
 		private ContextMenuStrip chatContextMenu;
 		private ContextMenuStrip logContextMenu;
+		private ContextMenuStrip AdminContextMenu;
 		private ContextMenuStrip executeContextMenu;
 		private ListViewColumnSorter playerSorter;
 		private ListViewColumnSorter banSorter;
@@ -315,6 +316,33 @@ namespace DaRT
 			banSorter = new ListViewColumnSorter();
 			this.bansList.ListViewItemSorter = banSorter;
 		}
+
+		private void InitializeAdminsList()
+		{
+			// Initializing context menu of ban list
+			AdminContextMenu = new ContextMenuStrip();
+			AdminContextMenu.Items.Add("Copy GUID/IP", null, bansCopyGUIDIP_click);
+			AdminContextMenu.Items.Add("Set comment", null, comment_click);
+			AdminContextMenu.Items.Add("Unban", null, unban_click);
+			AdminContextMenu.Items.Add("Resolve and view Steam Profile", null, ban_steam_profile);
+			AdminContextMenu.Items.Add("-");
+			AdminContextMenu.Items.Add("Remove all expired bans", null, expired_click);
+
+			// Attaching event handlers to detect state of context menu
+			AdminContextMenu.Opened += new System.EventHandler(this.menu_Opened);
+			AdminContextMenu.Closed += new System.Windows.Forms.ToolStripDropDownClosedEventHandler(this.menu_Closed);
+
+			// Adding the columns to the ban list
+			adminList.Columns.Add("#", 50);
+			adminList.Columns.Add("IP", 200);
+			adminList.Columns.Add("Minutes left", 100);
+			adminList.Columns.Add("Country");
+
+			// Initializing the ban sorter used to sort the ban list
+			banSorter = new ListViewColumnSorter();
+			this.adminList.ListViewItemSorter = banSorter;
+		}
+
 		private void InitializePlayerDBList()
 		{
 			// Initializing the context menu for the player database
@@ -3200,6 +3228,7 @@ namespace DaRT
 			InitializePlayerList();
 			InitializeBansList();
 			InitializePlayerDBList();
+			InitializeAdminsList();
 			InitializeFunctions();
 			InitializeConsole();
 			InitializeBanner();

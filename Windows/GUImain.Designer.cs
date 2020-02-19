@@ -59,6 +59,7 @@ namespace DaRT
 			this.playerDBList = new System.Windows.Forms.ListView();
 			this.AdminListTab = new System.Windows.Forms.TabPage();
 			this.playerCounter = new System.Windows.Forms.Label();
+			this.adminList = new System.Windows.Forms.ListView();
 			this.news = new System.Windows.Forms.Label();
 			this.banCounter = new System.Windows.Forms.Label();
 			this.adminCounter = new System.Windows.Forms.Label();
@@ -351,6 +352,7 @@ namespace DaRT
 			this.playerList.View = System.Windows.Forms.View.Details;
 			this.playerList.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.playerList_ColumnClick);
 			this.playerList.MouseDown += new System.Windows.Forms.MouseEventHandler(this.playerList_MouseDown);
+			// Admins Tab
 			// 
 			// bansTab
 			// 
