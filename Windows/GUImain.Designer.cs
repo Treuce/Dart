@@ -57,7 +57,7 @@ namespace DaRT
 			this.bansList = new System.Windows.Forms.ListView();
 			this.playerdatabaseTab = new System.Windows.Forms.TabPage();
 			this.playerDBList = new System.Windows.Forms.ListView();
-			this.tabPage1 = new System.Windows.Forms.TabPage();
+			this.AdminListTab = new System.Windows.Forms.TabPage();
 			this.playerCounter = new System.Windows.Forms.Label();
 			this.news = new System.Windows.Forms.Label();
 			this.banCounter = new System.Windows.Forms.Label();
@@ -313,7 +313,7 @@ namespace DaRT
 			this.AdminsTab.Controls.Add(this.playersTab);
 			this.AdminsTab.Controls.Add(this.bansTab);
 			this.AdminsTab.Controls.Add(this.playerdatabaseTab);
-			this.AdminsTab.Controls.Add(this.tabPage1);
+			this.AdminsTab.Controls.Add(this.AdminListTab);
 			this.AdminsTab.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.AdminsTab.Location = new System.Drawing.Point(0, 0);
 			this.AdminsTab.Name = "AdminsTab";
@@ -414,13 +414,13 @@ namespace DaRT
 			// 
 			// tabPage1
 			// 
-			this.tabPage1.Location = new System.Drawing.Point(4, 25);
-			this.tabPage1.Name = "tabPage1";
-			this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-			this.tabPage1.Size = new System.Drawing.Size(1079, 300);
-			this.tabPage1.TabIndex = 3;
-			this.tabPage1.Text = "Admins";
-			this.tabPage1.UseVisualStyleBackColor = true;
+			this.AdminListTab.Location = new System.Drawing.Point(4, 25);
+			this.AdminListTab.Name = "tabPage1";
+			this.AdminListTab.Padding = new System.Windows.Forms.Padding(3);
+			this.AdminListTab.Size = new System.Drawing.Size(1079, 300);
+			this.AdminListTab.TabIndex = 3;
+			this.AdminListTab.Text = "Admins";
+			this.AdminListTab.UseVisualStyleBackColor = true;
 			// 
 			// playerCounter
 			// 
@@ -759,8 +759,8 @@ namespace DaRT
 			this.tabChat.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
 			this.tabConsole.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
 			this.tabConsole.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.tabPage1.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.tabPage1.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.AdminListTab.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.AdminListTab.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
 			this.tabLog.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
 			this.tabLog.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
 			this.execute.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
@@ -874,7 +874,7 @@ namespace DaRT
 		private System.Windows.Forms.ListView bansList;
 		private System.Windows.Forms.TabPage playerdatabaseTab;
 		private System.Windows.Forms.ListView playerDBList;
-		private System.Windows.Forms.TabPage tabPage1;
+		private System.Windows.Forms.TabPage AdminListTab;
 		private System.Windows.Forms.CheckBox allowMessages;
 		private System.Windows.Forms.Button button1;
 		private System.Windows.Forms.Button hosts;
