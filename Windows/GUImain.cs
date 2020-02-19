@@ -15,6 +15,7 @@ using System.Xml;
 using DaRT.Properties;
 using System.Net.Sockets;
 using DaRT.Helpers;
+using System.Threading.Tasks;
 
 namespace DaRT
 {
@@ -262,7 +263,7 @@ namespace DaRT
 			// Attaching event handlers to detect state of context menu
 			playerContextMenu.Opened += new System.EventHandler(this.menu_Opened);
 			playerContextMenu.Closed += new System.Windows.Forms.ToolStripDropDownClosedEventHandler(this.menu_Closed);
-			
+
 			// Adding the columns to the player list
 			playerList.Columns.Add("", 45);
 			playerList.Columns.Add("#", 30);
@@ -274,7 +275,7 @@ namespace DaRT
 			playerList.Columns.Add("Name", 180);
 			playerList.Columns.Add("Status", 100);
 			playerList.Columns.Add("Comment", 210);
-			
+
 
 			// Initializing the player sorter used to sort the player list
 			playerSorter = new ListViewColumnSorter();
@@ -320,27 +321,13 @@ namespace DaRT
 		private void InitializeAdminsList()
 		{
 			// Initializing context menu of ban list
-			AdminContextMenu = new ContextMenuStrip();
-			AdminContextMenu.Items.Add("Copy GUID/IP", null, bansCopyGUIDIP_click);
-			AdminContextMenu.Items.Add("Set comment", null, comment_click);
-			AdminContextMenu.Items.Add("Unban", null, unban_click);
-			AdminContextMenu.Items.Add("Resolve and view Steam Profile", null, ban_steam_profile);
-			AdminContextMenu.Items.Add("-");
-			AdminContextMenu.Items.Add("Remove all expired bans", null, expired_click);
+			//AdminContextMenu = new ContextMenuStrip();
+			//AdminContextMenu.Items.Add("Copy IP", null, bansCopyGUIDIP_click);
 
-			// Attaching event handlers to detect state of context menu
-			AdminContextMenu.Opened += new System.EventHandler(this.menu_Opened);
-			AdminContextMenu.Closed += new System.Windows.Forms.ToolStripDropDownClosedEventHandler(this.menu_Closed);
-
-			// Adding the columns to the ban list
+			//Adding the columns to the ban list
 			adminList.Columns.Add("#", 50);
 			adminList.Columns.Add("IP", 200);
-			adminList.Columns.Add("Minutes left", 100);
-			adminList.Columns.Add("Country");
-
-			// Initializing the ban sorter used to sort the ban list
-			banSorter = new ListViewColumnSorter();
-			this.adminList.ListViewItemSorter = banSorter;
+			adminList.Columns.Add("Country", 200);
 		}
 
 		private void InitializePlayerDBList()
@@ -371,7 +358,7 @@ namespace DaRT
 			playerDBList.Columns.Add("Name", 200);
 			playerDBList.Columns.Add("Last seen on", 95);
 			playerDBList.Columns.Add("Comment", 120);
-			
+
 			//playerDBList.Columns.Add("Country Code", 40);
 
 			// Initializing the sorter for the player database
@@ -414,13 +401,6 @@ namespace DaRT
 			// Setting the image in the lower right corner
 			banner.Image = GetImage("Please connect to a server...");
 		}
-		private void InitializeNews()
-		{
-			// Requesting the news
-			//Thread thread = new Thread(new ThreadStart(thread_News));
-			//thread.IsBackground = true;f
-			//thread.Start();
-		}
 		private void InitializeProxy()
 		{
 			// Getting default proxy
@@ -457,9 +437,10 @@ namespace DaRT
 		{
 			if (!pendingConnect)
 			{
-				Thread thread = new Thread(new ThreadStart(thread_Connect));
-				thread.IsBackground = true;
-				thread.Start();
+				Task.Run(thread_Connect);
+				//Thread thread = new Thread(new ThreadStart(thread_Connect));
+				//thread.IsBackground = true;
+				//thread.Start();
 			}
 			else
 				this.Log("DaRT is already connecting. Please wait for it to finish before connecting again.", LogType.Console, false);
@@ -473,12 +454,7 @@ namespace DaRT
 					// Refresh if BattleNET is connected and no request is pending
 					if (rcon.Connected && !pendingPlayers)
 					{
-						Thread thread = new Thread(new ThreadStart(thread_Player));
-						thread.IsBackground = true;
-						thread.Start();
-						//Thread banner = new Thread(new ThreadStart(thread_Banner));
-						//banner.IsBackground = true;
-						//banner.Start();
+						Task.Run(thread_Player);
 					}
 					else
 					{
@@ -488,11 +464,11 @@ namespace DaRT
 				else if (AdminsTab.SelectedTab.Text == "Bans")
 				{
 					// Refresh bans if no other request is pending
-					if (!pendingBans)
+					if (!pendingBans && rcon.Connected)
 					{
-						Thread thread = new Thread(new ThreadStart(thread_Bans));
-						thread.IsBackground = true;
-						thread.Start();
+						Task.Run(thread_Bans);
+						//thread.IsBackground = true;
+						//thread.Start();
 						//Thread banner = new Thread(new ThreadStart(thread_Banner));
 						//banner.IsBackground = true;
 						//banner.Start();
@@ -502,15 +478,21 @@ namespace DaRT
 						this.Log("There already is a pending ban list request, please wait for it to finish!", LogType.Console, false);
 					}
 				}
+				else if (AdminsTab.SelectedTab.Text == "Admins")
+				{
+					if (rcon.Connected)
+						Task.Run(thread_Admins);
+				}
 			}
 			else
 			{
 				// Refresh player database
 				if (!pendingDatabase)
 				{
-					Thread thread = new Thread(new ThreadStart(thread_Database));
-					thread.IsBackground = true;
-					thread.Start();
+					Task.Run(thread_Database);
+					//Thread thread = new Thread(new ThreadStart(thread_Database));
+					//thread.IsBackground = true;
+					//thread.Start();
 				}
 			}
 		}
@@ -680,7 +662,7 @@ namespace DaRT
 				this.Log(e.StackTrace, LogType.Debug, false);
 			}
 		}
-		private void steam_profile_view(object sender,EventArgs e)
+		private void steam_profile_view(object sender, EventArgs e)
 		{
 			Process p = new Process();
 			ListViewItem item = playerList.SelectedItems[0];
@@ -1177,6 +1159,7 @@ namespace DaRT
 				{
 					// Switching everything to player tab
 					search.Text = "";
+					search.Enabled = true;
 					if (connect.Enabled)
 						refresh.Enabled = false;
 					filter.Items.Clear();
@@ -1206,6 +1189,7 @@ namespace DaRT
 				{
 					// Switching to player database tab
 					search.Text = "";
+					search.Enabled = true;
 					if (!refresh.Enabled)
 						refresh.Enabled = true;
 					filter.Items.Clear();
@@ -1259,7 +1243,7 @@ namespace DaRT
 
 						for (int i = 0; i < playersDB.Count; i++)
 						{
-							String[] items = { playersDB[i].number.ToString(), playersDB[i].ip, playersDB[i].lastseen, playersDB[i].guid,playersDB[i].uid, playersDB[i].name, playersDB[i].lastseenon, playersDB[i].comment };
+							String[] items = { playersDB[i].number.ToString(), playersDB[i].ip, playersDB[i].lastseen, playersDB[i].guid, playersDB[i].uid, playersDB[i].name, playersDB[i].lastseenon, playersDB[i].comment };
 							ListViewItem item = new ListViewItem(items);
 							dbCache.Add(item);
 						}
@@ -1269,6 +1253,13 @@ namespace DaRT
 						this.Log(e.Message, LogType.Debug, false);
 						this.Log(e.StackTrace, LogType.Debug, false);
 					}
+				}
+				else if (AdminsTab.SelectedTab.Text == "Admins" && this.rcon.Connected)
+				{
+					search.Enabled = false;
+					//this.adminList.VirtualListSize = 1;
+					Task.Run(thread_Admins);
+					//this.AdminListTab.BackColor = Color.Red;
 				}
 			}
 			catch (Exception e)
@@ -1406,16 +1397,19 @@ namespace DaRT
 						// Request players, bans and admins when enabled
 						if (Settings.Default.requestOnConnect && rcon.Connected)
 						{
-							Thread threadPlayer = new Thread(new ThreadStart(thread_Player));
-							threadPlayer.IsBackground = true;
-							threadPlayer.Start();
-							Thread.Sleep(50);
-							Thread threadBans = new Thread(new ThreadStart(thread_Bans));
-							threadBans.IsBackground = true;
-							threadBans.Start();
-							Thread threadAdmins = new Thread(new ThreadStart(thread_Admins));
-							threadAdmins.IsBackground = true;
-							threadAdmins.Start();
+							Task.Run(thread_Player);
+							//Thread threadPlayer = new Thread(new ThreadStart(thread_Player));
+							//threadPlayer.IsBackground = true;
+							//threadPlayer.Start();
+							//Thread.Sleep(50);
+							Task.Run(thread_Bans);
+							//Thread threadBans = new Thread(new ThreadStart(thread_Bans));
+							//threadBans.IsBackground = true;
+							//threadBans.Start();
+							Task.Run(thread_Admins);
+							//Thread threadAdmins = new Thread(new ThreadStart(thread_Admins));
+							//threadAdmins.IsBackground = true;
+							//threadAdmins.Start();
 						}
 						else
 						{
@@ -1874,7 +1868,7 @@ namespace DaRT
 								}
 							}
 
-							playersDB.Add(new Player(id, lastip, lastseen, guid, name, lastseenon, comment, true,uid));
+							playersDB.Add(new Player(id, lastip, lastseen, guid, name, lastseenon, comment, true, uid));
 						}
 					}
 				}
@@ -1907,13 +1901,32 @@ namespace DaRT
 		}
 		private void thread_Admins()
 		{
-			int admins = 0;
+			List<string> admins;
 			admins = rcon.getAdmins();
-
+			List<ListViewItem> items = new List<ListViewItem>();
 			this.Invoke((MethodInvoker)delegate
 			{
-				setAdminCount(admins);
+				adminList.SuspendLayout();
+				adminList.Items.Clear();
+				this.adminList.VirtualListSize = admins.Count;
+				adminList.Refresh();
+				setAdminCount(admins.Count);
+				for (int i = 0; i < admins.Count; i++)
+				{
+					string[] entries = { i.ToString(), admins[i], WebClientAsd.GetIPLocation(admins[i]) };
+					items.Add(new ListViewItem(entries));
+				}
+				adminList.VirtualListSize = items.Count;
+				adminList.Items.AddRange(items.ToArray());
+				adminList.ResumeLayout();
+				adminList.Refresh();
+				//adminList.Invoke((MethodInvoker)delegate
+				//{
+				//	adminList.Refresh();
+				//});
+				//Debugger.Break();
 			});
+
 		}
 		private void thread_Banner()
 		{
@@ -2026,7 +2039,7 @@ namespace DaRT
 					String location = this.GetSafeString(reader, 5);
 					String lastseen = this.GetSafeString(reader, 6);
 
-					sync.Add(new Player(0, lastip, "", guid, name, "", lastseen, lastseenon, location,uid));
+					sync.Add(new Player(0, lastip, "", guid, name, "", lastseen, lastseenon, location, uid));
 				}
 
 				reader.Close();
@@ -3220,6 +3233,7 @@ namespace DaRT
 		}
 		private void GUI_Load(object sender, EventArgs args)
 		{
+
 			InitializeSplitter();
 			InitializeText();
 			InitializeDatabase();
@@ -3232,7 +3246,6 @@ namespace DaRT
 			InitializeFunctions();
 			InitializeConsole();
 			InitializeBanner();
-			//InitializeNews();
 			InitializeProxy();
 
 			InitializeFonts();
@@ -3271,9 +3284,10 @@ namespace DaRT
 
 			if (Settings.Default.connectOnStartup)
 			{
-				Thread thread = new Thread(new ThreadStart(thread_Connect));
-				thread.IsBackground = true;
-				thread.Start();
+				Task.Run(thread_Connect);
+				//Thread thread = new Thread(new ThreadStart(thread_Connect));
+				//thread.IsBackground = true;
+				//thread.Start();
 			}
 		}
 
@@ -3635,7 +3649,7 @@ namespace DaRT
 							commentReader.Dispose();
 							commentCommand.Dispose();
 
-							playersDB.Add(new Player(id, lastip, lastseen, guid, name, lastseenon, comment, true,uid));
+							playersDB.Add(new Player(id, lastip, lastseen, guid, name, lastseenon, comment, true, uid));
 						}
 						reader.Close();
 						reader.Dispose();
@@ -3834,8 +3848,8 @@ namespace DaRT
 			}
 			else
 			{
-				Program.UIBackGroundColor.color = Color.White;
-				Program.UITextColor.color = Color.Black;
+				Program.UIBackGroundColor.color = Color.Black;
+				Program.UITextColor.color = Color.White;
 			}
 		}
 		#endregion

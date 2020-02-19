@@ -8,6 +8,7 @@ using System.Threading;
 using System.Net;
 using System.Drawing;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace DaRT
 {
@@ -436,7 +437,7 @@ namespace DaRT
             }
             */
         }
-        public int getAdmins()
+        public List<string> getAdmins()
         {
             int admins = 0;
 
@@ -449,15 +450,15 @@ namespace DaRT
                 Thread.Sleep(10);
                 ticks++;
             }
-
+            List<String> ips = new List<String>();
             if (response == null)
             {
                 if (!_reconnecting)
                     _form.Log("Admin request timed out.", LogType.Console, false);
-                return admins;
+                return ips;
             }
 
-            List<String> ips = new List<String>();
+          
             using (StringReader reader = new StringReader(response))
             {
                 string line;
@@ -473,9 +474,9 @@ namespace DaRT
                     }
                 }
             }
-            admins = ips.Count;
+            //admins = ips.Count;
 
-            return admins;
+            return ips;
         }
 
         public List<String> getRawAdmins()
@@ -690,9 +691,10 @@ namespace DaRT
 
                             if (Settings.Default.refreshOnJoin && message.EndsWith("disconnected") && !_form.pendingPlayers)
                             {
-                                Thread thread = new Thread(new ThreadStart(_form.thread_Player));
-                                thread.IsBackground = true;
-                                thread.Start();
+                                Task.Run(_form.thread_Player);
+                                //Thread thread = new Thread(new ThreadStart(_form.thread_Player));
+                                //thread.IsBackground = true;
+                                //thread.Start();
                             }
 
                             // Connect/disconnect/kick/ban messages
@@ -707,9 +709,10 @@ namespace DaRT
 
                             if (Settings.Default.refreshOnJoin && !_form.pendingPlayers)
                             {
-                                Thread thread = new Thread(new ThreadStart(_form.thread_Player));
-                                thread.IsBackground = true;
-                                thread.Start();
+                                Task.Run(_form.thread_Player);
+                                //Thread thread = new Thread(new ThreadStart(_form.thread_Player));
+                                //thread.IsBackground = true;
+                                //thread.Start();
                             }
                         }
                         else if (message.StartsWith("RCon admin #"))

@@ -94,6 +94,8 @@ namespace DaRT
 			this.AdminsTab.SuspendLayout();
 			this.playersTab.SuspendLayout();
 			this.bansTab.SuspendLayout();
+			this.AdminListTab.SuspendLayout();
+			this.adminList.SuspendLayout();
 			this.playerdatabaseTab.SuspendLayout();
 			this.logTabs.SuspendLayout();
 			this.tabAll.SuspendLayout();
@@ -325,6 +327,7 @@ namespace DaRT
 			// 
 			// playersTab
 			// 
+			
 			this.playersTab.Controls.Add(this.playerList);
 			this.playersTab.Location = new System.Drawing.Point(4, 25);
 			this.playersTab.Name = "playersTab";
@@ -352,7 +355,26 @@ namespace DaRT
 			this.playerList.View = System.Windows.Forms.View.Details;
 			this.playerList.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.playerList_ColumnClick);
 			this.playerList.MouseDown += new System.Windows.Forms.MouseEventHandler(this.playerList_MouseDown);
-			// Admins Tab
+			// Admins List
+			this.AdminListTab.Controls.Add(this.adminList);
+			this.adminList.AllowColumnReorder = true;
+			this.adminList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+			| System.Windows.Forms.AnchorStyles.Left)
+			| System.Windows.Forms.AnchorStyles.Right)));
+			this.adminList.BorderStyle = System.Windows.Forms.BorderStyle.None;
+			this.adminList.FullRowSelect = true;
+			this.adminList.GridLines = true;
+			this.adminList.HideSelection = false;
+			this.adminList.Location = new System.Drawing.Point(0, 0);
+			this.adminList.MultiSelect = false;
+			this.adminList.Name = "playerList";
+			this.adminList.Size = new System.Drawing.Size(1079, 300);
+			this.adminList.TabIndex = 0;
+			this.adminList.UseCompatibleStateImageBehavior = false;
+			this.adminList.View = System.Windows.Forms.View.Details;
+			this.adminList.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.playerList_ColumnClick);
+			this.adminList.MouseDown += new System.Windows.Forms.MouseEventHandler(this.playerList_MouseDown);
+
 			// 
 			// bansTab
 			// 
@@ -787,7 +809,8 @@ namespace DaRT
 			this.bansList.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
 			this.playerDBList.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
 			this.playerDBList.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-
+			this.adminList.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.adminList.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
 			// 
 			// GUI Main
 			// 

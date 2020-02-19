@@ -11,373 +11,382 @@ using System.ComponentModel;
 
 namespace DaRT
 {
-    class Sample : INotifyPropertyChanged
-    {
-        public Sample(Color color_asd)
-        {
-            mColor = color_asd;
-        }
-        private Color mColor;
-        public Color color
-        {
-            get { return mColor; InvokePropertyChanged(new PropertyChangedEventArgs("color")); }
-            set
-            {
-                mColor = value;
-                InvokePropertyChanged(new PropertyChangedEventArgs("color"));
-            }
-        }
 
-        #region Implementation of INotifyPropertyChanged
+	#region PropertyChanged Class
+	class Sample : INotifyPropertyChanged
+	{
+		public Sample(Color color_asd)
+		{
+			mColor = color_asd;
+		}
+		private Color mColor;
+		public Color color
+		{
+			get { return mColor; InvokePropertyChanged(new PropertyChangedEventArgs("color")); }
+			set
+			{
+				mColor = value;
+				InvokePropertyChanged(new PropertyChangedEventArgs("color"));
+			}
+		}
 
-        public event PropertyChangedEventHandler PropertyChanged;
+		#region Implementation of INotifyPropertyChanged
 
-        public void InvokePropertyChanged(PropertyChangedEventArgs e)
-        {
-            PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler != null) handler(this, e);
-        }
+		public event PropertyChangedEventHandler PropertyChanged;
 
-        #endregion
-    }
-    static class Program
-    {
-        public static Sample UIBackGroundColor = new Sample(Color.White);
-        public static Sample UITextColor = new Sample(Color.Black);
-        static String version = "v2.1";
-        public static GUImain gui;
-        static StreamWriter writer;
+		public void InvokePropertyChanged(PropertyChangedEventArgs e)
+		{
+			PropertyChangedEventHandler handler = PropertyChanged;
+			if (handler != null) handler(this, e);
+		}
 
-        [DllImport("kernel32.dll", EntryPoint = "AllocConsole", SetLastError = true, CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
-        private static extern int AllocConsole();
+		#endregion
+	}
+	#endregion
 
-        static void CatchThreadException(object sender, ThreadExceptionEventArgs e)
-        {
-            new GUIcrash(e.Exception, version, gui).ShowDialog();
-        }
 
-        static void CatchUnhandledException(object sender, UnhandledExceptionEventArgs e)
-        {
-            new GUIcrash(e.ExceptionObject as Exception, version, gui).ShowDialog();
-        }
+	static class Program
+	{
+		#region Variables/Properties
+		public static Sample UIBackGroundColor = new Sample(Color.White);
+		public static Sample UITextColor = new Sample(Color.Black);
+		static String version = "v2.1";
+		public static GUImain gui;
+		static StreamWriter writer;
 
-        [STAThread]
-        static void Main(string[] args)
-        {
-            if (args.Length == 0)
-            {
-                if (Debugger.IsAttached)
-                {
-                    Application.EnableVisualStyles();
-                    Application.SetCompatibleTextRenderingDefault(false);
-                    gui = new GUImain(version);
-                    Application.Run(gui);
-                    return;
-                }
-                Application.ThreadException += CatchThreadException;
-                AppDomain.CurrentDomain.UnhandledException += CatchUnhandledException;
+		#endregion
 
-                Application.EnableVisualStyles();
-                Application.SetCompatibleTextRenderingDefault(false);
-                gui = new GUImain(version);
-                Application.Run(gui);
-            }
-            else
-            {
-                AllocConsole();
+		[DllImport("kernel32.dll", EntryPoint = "AllocConsole", SetLastError = true, CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
+		private static extern int AllocConsole();
 
-                #region Read Config
-                String ip = "127.0.0.1";
-                int port = 2302;
-                String password = "password";
-                String command = "";
-                String output = "";
-                String script = "";
-                int loop = 0;
-                bool close = false;
+		static void CatchThreadException(object sender, ThreadExceptionEventArgs e)
+		{
+			new GUIcrash(e.Exception, version, gui).ShowDialog();
+		}
 
-                foreach (String arg in args)
-                {
-                    if (arg.StartsWith("-ip="))
-                    {
-                        ip = arg.Split(new char[] { '=' }, 2, StringSplitOptions.RemoveEmptyEntries)[1]; ;
-                    }
-                    else if (arg.StartsWith("-port="))
-                    {
-                        try
-                        {
-                            port = Int32.Parse(arg.Split(new char[] { '=' }, 2, StringSplitOptions.RemoveEmptyEntries)[1]);
-                        }
-                        catch
-                        {
-                            port = 2302;
-                        }
-                    }
-                    else if (arg.StartsWith("-password=") || arg.StartsWith("-pass=") || arg.StartsWith("-pw="))
-                    {
-                        password = arg.Split(new char[] { '=' }, 2, StringSplitOptions.RemoveEmptyEntries)[1];
-                    }
-                    else if (arg.StartsWith("-command="))
-                    {
-                        command = arg.Split(new char[] { '=' }, 2, StringSplitOptions.RemoveEmptyEntries)[1];
-                    }
-                    else if (arg.StartsWith("-output="))
-                    {
-                        output = arg.Split(new char[] { '=' }, 2, StringSplitOptions.RemoveEmptyEntries)[1];
-                    }
-                    else if(arg.StartsWith("-close"))
-                    {
-                        close = true;
-                    }
-                    else if (arg.StartsWith("-script="))
-                    {
-                        script = arg.Split(new char[] { '=' }, 2, StringSplitOptions.RemoveEmptyEntries)[1];
-                    }
-                    else if (arg.StartsWith("-loop="))
-                    {
-                        loop = Int32.Parse(arg.Split(new char[] { '=' }, 2, StringSplitOptions.RemoveEmptyEntries)[1]);
-                    }
-                }
-                #endregion
+		static void CatchUnhandledException(object sender, UnhandledExceptionEventArgs e)
+		{
+			new GUIcrash(e.ExceptionObject as Exception, version, gui).ShowDialog();
+		}
 
-                #region Establish Connection
-                RCon rcon = new RCon(null);
-                rcon.Connect(IPAddress.Parse(ip), port, password);
-                #endregion
+		[STAThread]
+		static void Main(string[] args)
+		{
+			if (args.Length == 0)
+			{
+				if (Debugger.IsAttached)
+				{
+					Application.EnableVisualStyles();
+					Application.SetCompatibleTextRenderingDefault(false);
+					gui = new GUImain(version);
+					Application.Run(gui);
+					return;
+				}
+				Application.ThreadException += CatchThreadException;
+				AppDomain.CurrentDomain.UnhandledException += CatchUnhandledException;
 
-                #region Writing header
-                if (output != "")
-                    writer = File.CreateText(output);
+				Application.EnableVisualStyles();
+				Application.SetCompatibleTextRenderingDefault(false);
+				gui = new GUImain(version);
+				Application.Run(gui);
+			}
+			else
+			{
+				AllocConsole();
 
-                Write("UK111 - DayZ RCon Tool");
-                if (command != "")
-                    Write("Running in command mode.");
-                else if (script != "")
-                    Write("Running in script mode.");
-                Write("---------------------");
-                Write("Supplied arguments:");
-                foreach (String arg in args)
-                {
-                    Write(arg);
-                }
-                Write("---------------------");
-                Write("Output:");
-                #endregion
+				#region Read Config
+				String ip = "127.0.0.1";
+				int port = 2302;
+				String password = "password";
+				String command = "";
+				String output = "";
+				String script = "";
+				int loop = 0;
+				bool close = false;
 
-                if (command != "")
-                {
-                    #region Command mode
-                    if (command == "players")
-                    {
-                        List<String> players = rcon.getRawPlayers();
-                        foreach (String player in players)
-                            Write(player);
-                    }
-                    else if (command == "bans")
-                    {
-                        List<String> bans = rcon.getRawBans();
-                        foreach (String ban in bans)
-                            Write(ban);
-                    }
-                    else if (command == "admins")
-                    {
-                        List<String> admins = rcon.getRawAdmins();
-                        foreach (String admin in admins)
-                            Write(admin);
-                    }
-                    else
-                    {
-                        rcon.execute(command);
-                        Write("Command executed successfully!");
-                    }
-                    #endregion
-                }
-                else if (script != "")
-                {
-                    #region Script mode
-                    Write("Running " + script);
+				foreach (String arg in args)
+				{
+					if (arg.StartsWith("-ip="))
+					{
+						ip = arg.Split(new char[] { '=' }, 2, StringSplitOptions.RemoveEmptyEntries)[1]; ;
+					}
+					else if (arg.StartsWith("-port="))
+					{
+						try
+						{
+							port = Int32.Parse(arg.Split(new char[] { '=' }, 2, StringSplitOptions.RemoveEmptyEntries)[1]);
+						}
+						catch
+						{
+							port = 2302;
+						}
+					}
+					else if (arg.StartsWith("-password=") || arg.StartsWith("-pass=") || arg.StartsWith("-pw="))
+					{
+						password = arg.Split(new char[] { '=' }, 2, StringSplitOptions.RemoveEmptyEntries)[1];
+					}
+					else if (arg.StartsWith("-command="))
+					{
+						command = arg.Split(new char[] { '=' }, 2, StringSplitOptions.RemoveEmptyEntries)[1];
+					}
+					else if (arg.StartsWith("-output="))
+					{
+						output = arg.Split(new char[] { '=' }, 2, StringSplitOptions.RemoveEmptyEntries)[1];
+					}
+					else if(arg.StartsWith("-close"))
+					{
+						close = true;
+					}
+					else if (arg.StartsWith("-script="))
+					{
+						script = arg.Split(new char[] { '=' }, 2, StringSplitOptions.RemoveEmptyEntries)[1];
+					}
+					else if (arg.StartsWith("-loop="))
+					{
+						loop = Int32.Parse(arg.Split(new char[] { '=' }, 2, StringSplitOptions.RemoveEmptyEntries)[1]);
+					}
+				}
+				#endregion
 
-                    String[] lines = File.ReadAllLines(script);
-                    List<String> commands = new List<String>();
+				#region Establish Connection
+				RCon rcon = new RCon(null);
+				rcon.Connect(IPAddress.Parse(ip), port, password);
+				#endregion
 
-                    foreach (String line in lines)
-                    {
-                        if (line != "")
-                        {
-                            if (!line.StartsWith("//"))
-                            {
-                                commands.Add(line);
-                            }
-                        }
-                    }
+				#region Writing header
+				if (output != "")
+					writer = File.CreateText(output);
 
-                    bool looping = true;
-                    int run = 0;
-                    do
-                    {
-                        foreach (String c in commands)
-                        {
-                            if (c.StartsWith("wait="))
-                            {
-                                int amount = Int32.Parse(c.Split('=')[1]);
-                                Write("Waiting " + (amount / 1000) + "s");
-                                Thread.Sleep(amount);
-                                continue;
-                            }
-                            else if (c.StartsWith("exit") || c.StartsWith("quit") || c.StartsWith("close"))
-                            {
-                                Write("Stopped script.");
-                                break;
-                            }
+				Write("UK111 - DayZ RCon Tool");
+				if (command != "")
+					Write("Running in command mode.");
+				else if (script != "")
+					Write("Running in script mode.");
+				Write("---------------------");
+				Write("Supplied arguments:");
+				foreach (String arg in args)
+				{
+					Write(arg);
+				}
+				Write("---------------------");
+				Write("Output:");
+				#endregion
 
-                            String exec = c;
+				if (command != "")
+				{
+					#region Command mode
+					if (command == "players")
+					{
+						List<String> players = rcon.getRawPlayers();
+						foreach (String player in players)
+							Write(player);
+					}
+					else if (command == "bans")
+					{
+						List<String> bans = rcon.getRawBans();
+						foreach (String ban in bans)
+							Write(ban);
+					}
+					else if (command == "admins")
+					{
+						List<String> admins = rcon.getRawAdmins();
+						foreach (String admin in admins)
+							Write(admin);
+					}
+					else
+					{
+						rcon.execute(command);
+						Write("Command executed successfully!");
+					}
+					#endregion
+				}
+				#region Something else command mode???
+				else if (script != "")
+				{
+					#region Script mode
+					Write("Running " + script);
 
-                            int players;
-                            int admins;
-                            int bans;
-                            String randomPlayer;
-                            if (c.Contains("%p"))
-                            {
-                                players = rcon.getPlayers().Count;
-                                exec = c.Replace("%p", players.ToString());
-                            }
-                            if (c.Contains("%a"))
-                            {
-                                admins = rcon.getAdmins();
-                                exec = c.Replace("%a", admins.ToString());
-                            }
-                            if (c.Contains("%b"))
-                            {
-                                bans = rcon.getBans().Count;
-                                exec = c.Replace("%b", bans.ToString());
-                            }
-                            if (c.Contains("%r"))
-                            {
-                                List<Player> p = rcon.getPlayers();
-                                if (p.Count > 0)
-                                {
-                                    Random random = new Random();
-                                    randomPlayer = p[random.Next(0, p.Count)].name;
-                                    exec = c.Replace("%r", randomPlayer);
-                                }
-                            }
-                            if (c.Contains("%l"))
-                            {
-                                exec = c.Replace("%l", run.ToString());
-                            }
+					String[] lines = File.ReadAllLines(script);
+					List<String> commands = new List<String>();
 
-                            if (c.StartsWith("if"))
-                            {
-                                String[] items = exec.Split(new char[] { ':' }, 3, StringSplitOptions.RemoveEmptyEntries);
+					foreach (String line in lines)
+					{
+						if (line != "")
+						{
+							if (!line.StartsWith("//"))
+							{
+								commands.Add(line);
+							}
+						}
+					}
 
-                                String[] flags = items[0].Split(new char[] { ' ' }, 4, StringSplitOptions.RemoveEmptyEntries);
-                                String param1 = flags[1];
-                                String op = flags[2];
-                                String param2 = flags[3];
+					bool looping = true;
+					int run = 0;
+					do
+					{
+						foreach (String c in commands)
+						{
+							if (c.StartsWith("wait="))
+							{
+								int amount = Int32.Parse(c.Split('=')[1]);
+								Write("Waiting " + (amount / 1000) + "s");
+								Thread.Sleep(amount);
+								continue;
+							}
+							else if (c.StartsWith("exit") || c.StartsWith("quit") || c.StartsWith("close"))
+							{
+								Write("Stopped script.");
+								break;
+							}
 
-                                bool fulfilled = false;
+							String exec = c;
 
-                                if (op == ">")
-                                {
-                                    if (Int32.Parse(param1) > Int32.Parse(param2))
-                                        fulfilled = true;
-                                }
-                                else if (op == "<")
-                                {
-                                    if (Int32.Parse(param1) < Int32.Parse(param2))
-                                        fulfilled = true;
-                                }
-                                else if (op == "=" || op == "==")
-                                {
-                                    if (param1 == param2)
-                                        fulfilled = true;
-                                }
-                                else
-                                {
-                                }
+							int players;
+							List<string> admins;
+							int bans;
+							String randomPlayer;
+							if (c.Contains("%p"))
+							{
+								players = rcon.getPlayers().Count;
+								exec = c.Replace("%p", players.ToString());
+							}
+							if (c.Contains("%a"))
+							{
+								admins = rcon.getAdmins();
+								exec = c.Replace("%a", admins.Count.ToString());
+							}
+							if (c.Contains("%b"))
+							{
+								bans = rcon.getBans().Count;
+								exec = c.Replace("%b", bans.ToString());
+							}
+							if (c.Contains("%r"))
+							{
+								List<Player> p = rcon.getPlayers();
+								if (p.Count > 0)
+								{
+									Random random = new Random();
+									randomPlayer = p[random.Next(0, p.Count)].name;
+									exec = c.Replace("%r", randomPlayer);
+								}
+							}
+							if (c.Contains("%l"))
+							{
+								exec = c.Replace("%l", run.ToString());
+							}
 
-                                if (fulfilled)
-                                    exec = items[1];
-                                else if (items.Length == 3)
-                                    exec = items[2];
-                                else
-                                    continue;
-                            }
+							if (c.StartsWith("if"))
+							{
+								String[] items = exec.Split(new char[] { ':' }, 3, StringSplitOptions.RemoveEmptyEntries);
 
-                            if (exec.StartsWith("kickAll"))
-                            {
-                                Write("Kicking all players...");
-                                String reason;
-                                if (exec.Contains("="))
-                                    reason = exec.Split('=')[1];
-                                else
-                                    reason = "Admin Kick";
+								String[] flags = items[0].Split(new char[] { ' ' }, 4, StringSplitOptions.RemoveEmptyEntries);
+								String param1 = flags[1];
+								String op = flags[2];
+								String param2 = flags[3];
 
-                                List<Player> p = rcon.getPlayers();
+								bool fulfilled = false;
 
-                                foreach (Player player in p)
-                                {
-                                    rcon.kick(new Kick(player.number, player.name, reason));
-                                }
-                            }
-                            else if (exec.StartsWith("banAll"))
-                            {
-                                Write("Banning all players...");
-                                String reason;
-                                if (exec.Contains("="))
-                                    reason = exec.Split('=')[1];
-                                else
-                                    reason = "Admin Ban";
+								if (op == ">")
+								{
+									if (Int32.Parse(param1) > Int32.Parse(param2))
+										fulfilled = true;
+								}
+								else if (op == "<")
+								{
+									if (Int32.Parse(param1) < Int32.Parse(param2))
+										fulfilled = true;
+								}
+								else if (op == "=" || op == "==")
+								{
+									if (param1 == param2)
+										fulfilled = true;
+								}
+								else
+								{
+								}
 
-                                List<Player> p = rcon.getPlayers();
+								if (fulfilled)
+									exec = items[1];
+								else if (items.Length == 3)
+									exec = items[2];
+								else
+									continue;
+							}
 
-                                foreach (Player player in p)
-                                {
-                                    rcon.Ban(new Ban(player.number.ToString(), player.name, "0", reason));
-                                }
-                            }
-                            else if (exec.StartsWith("exec"))
-                            {
-                                String execute = exec.Split(new char[] { '=' }, 2, StringSplitOptions.RemoveEmptyEntries)[1];
-                                Write(execute);
-                                rcon.execute(execute);
-                            }
-                        }
+							if (exec.StartsWith("kickAll"))
+							{
+								Write("Kicking all players...");
+								String reason;
+								if (exec.Contains("="))
+									reason = exec.Split('=')[1];
+								else
+									reason = "Admin Kick";
 
-                        if (run == loop)
-                            looping = false;
+								List<Player> p = rcon.getPlayers();
 
-                        if (loop != -1)
-                            run++;
-                    } while (looping);
-                    #endregion
-                }
-                else
-                {
-                    Write("You need to run atleast one command or one script.");
-                }
-                
-                rcon.Disconnect();
-                if (writer != null)
-                {
-                    writer.Close();
-                    writer.Dispose();
-                }
-                if (!close)
-                {
-                    Console.WriteLine("All done. Press any key to close.");
-                    Console.ReadKey();
-                    Console.WriteLine("Closing...");
-                }
-            }
-        }
-        private static void Write(String line)
-        {
-            Console.WriteLine(line);
-            if (writer != null)
-            {
-                writer.WriteLine(line.ToString());
-            }
-        }
-    }
+								foreach (Player player in p)
+								{
+									rcon.kick(new Kick(player.number, player.name, reason));
+								}
+							}
+							else if (exec.StartsWith("banAll"))
+							{
+								Write("Banning all players...");
+								String reason;
+								if (exec.Contains("="))
+									reason = exec.Split('=')[1];
+								else
+									reason = "Admin Ban";
+
+								List<Player> p = rcon.getPlayers();
+
+								foreach (Player player in p)
+								{
+									rcon.Ban(new Ban(player.number.ToString(), player.name, "0", reason));
+								}
+							}
+							else if (exec.StartsWith("exec"))
+							{
+								String execute = exec.Split(new char[] { '=' }, 2, StringSplitOptions.RemoveEmptyEntries)[1];
+								Write(execute);
+								rcon.execute(execute);
+							}
+						}
+
+						if (run == loop)
+							looping = false;
+
+						if (loop != -1)
+							run++;
+					} while (looping);
+					#endregion
+				}
+				else
+				{
+					Write("You need to run atleast one command or one script.");
+				}
+				#endregion
+				rcon.Disconnect();
+				if (writer != null)
+				{
+					writer.Close();
+					writer.Dispose();
+				}
+				if (!close)
+				{
+					Console.WriteLine("All done. Press any key to close.");
+					Console.ReadKey();
+					Console.WriteLine("Closing...");
+				}
+			}
+		}
+		private static void Write(String line)
+		{
+			Console.WriteLine(line);
+			if (writer != null)
+			{
+				writer.WriteLine(line.ToString());
+			}
+		}
+	}
 }
