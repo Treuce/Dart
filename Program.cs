@@ -42,10 +42,10 @@ namespace DaRT
     }
     static class Program
     {
-        public static Sample ColorChangeshitBackGround = new Sample(Color.White);
-        public static Sample ColorChangeshitForeGround = new Sample(Color.Black);
+        public static Sample UIBackGroundColor = new Sample(Color.White);
+        public static Sample UITextColor = new Sample(Color.Black);
         static String version = "v2.1";
-        static GUImain gui;
+        public static GUImain gui;
         static StreamWriter writer;
 
         [DllImport("kernel32.dll", EntryPoint = "AllocConsole", SetLastError = true, CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]

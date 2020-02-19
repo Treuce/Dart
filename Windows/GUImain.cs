@@ -14,12 +14,13 @@ using System.Windows.Forms;
 using System.Xml;
 using DaRT.Properties;
 using System.Net.Sockets;
+using DaRT.Helpers;
 
 namespace DaRT
 {
 	public partial class GUImain : Form
 	{
-		#region Initialize
+		#region Constuctor 
 		public GUImain(String version)
 		{
 			// Initializing DaRT
@@ -41,7 +42,14 @@ namespace DaRT
 			InitializeComponent();
 		}
 
+		#endregion
+
+		#region Public Variables
 		// Public variables
+		int seconds = 0;
+		int minutes = 0;
+		int hours = 0;
+
 		public String version;
 		public RCon rcon;
 		private List<Player> players = new List<Player>();
@@ -74,6 +82,9 @@ namespace DaRT
 
 		private List<string> _buffer;
 
+		#endregion
+
+		#region Init
 		private void InitializeSplitter()
 		{
 			// Setting splitter size
@@ -237,6 +248,7 @@ namespace DaRT
 			(playerContextMenu.Items[0] as ToolStripMenuItem).DropDownItems.Add("All", null, playerCopyAll_click);
 			(playerContextMenu.Items[0] as ToolStripMenuItem).DropDownItems.Add("IP", null, playerCopyIP_click);
 			(playerContextMenu.Items[0] as ToolStripMenuItem).DropDownItems.Add("GUID", null, playerCopyGUID_click);
+			(playerContextMenu.Items[0] as ToolStripMenuItem).DropDownItems.Add("UID", null, playerCopyUID_click);
 			(playerContextMenu.Items[0] as ToolStripMenuItem).DropDownItems.Add("Name", null, playerCopyName_click);
 			playerContextMenu.Items.Add("Set comment", null, comment_click);
 			playerContextMenu.Items.Add("-");
@@ -244,11 +256,12 @@ namespace DaRT
 			playerContextMenu.Items.Add("Kick", null, kick_click);
 			playerContextMenu.Items.Add("Ban", null, ban_click);
 			playerContextMenu.Items.Add("Quick Ban", null, quickBan_click);
+			playerContextMenu.Items.Add("View Steam Profile", null, steam_profile_view);
 
 			// Attaching event handlers to detect state of context menu
 			playerContextMenu.Opened += new System.EventHandler(this.menu_Opened);
 			playerContextMenu.Closed += new System.Windows.Forms.ToolStripDropDownClosedEventHandler(this.menu_Closed);
-
+			
 			// Adding the columns to the player list
 			playerList.Columns.Add("", 45);
 			playerList.Columns.Add("#", 30);
@@ -260,7 +273,7 @@ namespace DaRT
 			playerList.Columns.Add("Name", 180);
 			playerList.Columns.Add("Status", 100);
 			playerList.Columns.Add("Comment", 210);
-
+			
 
 			// Initializing the player sorter used to sort the player list
 			playerSorter = new ListViewColumnSorter();
@@ -283,6 +296,7 @@ namespace DaRT
 			bansContextMenu.Items.Add("Copy GUID/IP", null, bansCopyGUIDIP_click);
 			bansContextMenu.Items.Add("Set comment", null, comment_click);
 			bansContextMenu.Items.Add("Unban", null, unban_click);
+			bansContextMenu.Items.Add("Resolve and view Steam Profile", null, ban_steam_profile);
 			bansContextMenu.Items.Add("-");
 			bansContextMenu.Items.Add("Remove all expired bans", null, expired_click);
 
@@ -314,6 +328,7 @@ namespace DaRT
 			playerDBContextMenu.Items.Add("-");
 			playerDBContextMenu.Items.Add("Ban (GUID only)", null, banOffline_click);
 			playerDBContextMenu.Items.Add("Set comment", null, comment_click);
+			playerDBContextMenu.Items.Add("View Steam Profile", null, playerDB_steam_profile_view);
 			playerDBContextMenu.Items.Add("-");
 			playerDBContextMenu.Items.Add("Delete entry", null, delete_click);
 			playerDBContextMenu.Opened += new System.EventHandler(this.menu_Opened);
@@ -324,10 +339,11 @@ namespace DaRT
 			playerDBList.Columns.Add("Last IP", 150);
 			playerDBList.Columns.Add("Last seen", 150);
 			playerDBList.Columns.Add("GUID", 250);
-			playerDBList.Columns.Add("UID", 100);
+			playerDBList.Columns.Add("UID", 130);
 			playerDBList.Columns.Add("Name", 200);
 			playerDBList.Columns.Add("Last seen on", 95);
 			playerDBList.Columns.Add("Comment", 120);
+			
 			//playerDBList.Columns.Add("Country Code", 40);
 
 			// Initializing the sorter for the player database
@@ -636,6 +652,22 @@ namespace DaRT
 				this.Log(e.StackTrace, LogType.Debug, false);
 			}
 		}
+		private void steam_profile_view(object sender,EventArgs e)
+		{
+			Process p = new Process();
+			ListViewItem item = playerList.SelectedItems[0];
+			String uid = item.SubItems[5].Text;
+			p.StartInfo.FileName = $@"https://steamcommunity.com/profiles/{uid}";
+			p.Start();
+		}
+		private void playerDB_steam_profile_view(object sender, EventArgs e)
+		{
+			ListViewItem item = dbCache[playerDBList.SelectedIndices[0]];
+			String uid = item.SubItems[4].Text;
+			Process p = new Process();
+			p.StartInfo.FileName = $@"https://steamcommunity.com/profiles/{uid}";
+			p.Start();
+		}
 		private void quickBan_click(object sender, EventArgs args)
 		{
 			try
@@ -673,6 +705,23 @@ namespace DaRT
 				this.Log("An error occurred, please try again.", LogType.Console, false);
 				this.Log(e.Message, LogType.Debug, false);
 				this.Log(e.StackTrace, LogType.Debug, false);
+			}
+		}
+		private void ban_steam_profile(object sender, EventArgs e)
+		{
+			ListViewItem item = bansCache[bansList.SelectedIndices[0]];
+			// Getting ban ID
+			string guid = item.SubItems[1].Text;
+			if (guid.Length == 32)
+			{
+				var uid = WebClientAsd.GetUID(guid);
+				Process p = new Process();
+				p.StartInfo.FileName = $@"https://steamcommunity.com/profiles/{uid}";
+				p.Start();
+			}
+			else
+			{
+				this.Log("Possibly tried to resolve a Steam ID by IP Address. This feature only supports resolving from Battleye GUIDs.", LogType.Console, false);
 			}
 		}
 		private void unban_click(object sender, EventArgs args)
@@ -779,7 +828,7 @@ namespace DaRT
 			try
 			{
 				ListViewItem item = playerList.SelectedItems[0];
-				String name = item.SubItems[5].Text;
+				String name = item.SubItems[6].Text;
 				Clipboard.SetText(name);
 			}
 			catch (Exception e)
@@ -863,7 +912,7 @@ namespace DaRT
 			try
 			{
 				ListViewItem item = dbCache[playerDBList.SelectedIndices[0]];
-				String guid = item.SubItems[3].Text;
+				String guid = item.SubItems[4].Text;
 				Clipboard.SetText(guid);
 			}
 			catch (Exception e)
@@ -879,7 +928,7 @@ namespace DaRT
 			try
 			{
 				ListViewItem item = dbCache[playerDBList.SelectedIndices[0]];
-				String name = item.SubItems[4].Text;
+				String name = item.SubItems[5].Text;
 				Clipboard.SetText(name);
 			}
 			catch (Exception e)
@@ -1215,7 +1264,7 @@ namespace DaRT
 				host.Text = host.Text.Replace(" ", "");
 			});
 
-			IPAddress ip;
+			IPAddress ip = IPAddress.None;
 			// Checking if host is IP
 			if (isIP(host.Text))
 			{
@@ -1223,7 +1272,14 @@ namespace DaRT
 			}
 			else
 			{
-				ip = Dns.GetHostEntry(host.Text).AddressList[0];
+				try
+				{
+					ip = Dns.GetHostEntry(host.Text).AddressList[0];
+				}
+				catch
+				{
+
+				}
 			}
 			// Checking if port is valid
 			if (isPort(port.Text))
@@ -1347,9 +1403,9 @@ namespace DaRT
 						}
 
 						// Requesting banner from GameTracker
-						Thread threadBanner = new Thread(new ThreadStart(thread_Banner));
-						threadBanner.IsBackground = true;
-						threadBanner.Start();
+						//Thread threadBanner = new Thread(new ThreadStart(thread_Banner));
+						//threadBanner.IsBackground = true;
+						//threadBanner.Start();
 
 						// Setting maximum of refresh timer
 						refreshTimer = Settings.Default.interval;
@@ -2576,10 +2632,7 @@ namespace DaRT
 		}
 		#endregion
 
-		int seconds = 0;
-		int minutes = 0;
-		int hours = 0;
-
+		#region Event Handlers
 		private void timer_Tick(object sender, EventArgs args)
 		{
 			if (!rcon.Reconnecting)
@@ -3137,7 +3190,6 @@ namespace DaRT
 				}
 			}
 		}
-
 		private void GUI_Load(object sender, EventArgs args)
 		{
 			InitializeSplitter();
@@ -3730,11 +3782,6 @@ namespace DaRT
 			counter.Text = input.Text.Length + "/400";
 		}
 
-		private void dart_Click(object sender, EventArgs e)
-		{
-			this.Close();
-		}
-
 		private void autoScroll_CheckedChanged(object sender, EventArgs e)
 		{
 			if (allowMessages.Checked && _queueing && _queue.Count > 0)
@@ -3751,16 +3798,17 @@ namespace DaRT
 
 		private void DarkModeToggle(object sender, EventArgs e)
 		{
-			if (Program.ColorChangeshitBackGround.color == Color.White)
+			if (Program.UIBackGroundColor.color == Color.White)
 			{
-				Program.ColorChangeshitBackGround.color = Color.Black;
-				Program.ColorChangeshitForeGround.color = Color.White;
+				Program.UIBackGroundColor.color = Color.Black;
+				Program.UITextColor.color = Color.White;
 			}
 			else
 			{
-				Program.ColorChangeshitBackGround.color = Color.White;
-				Program.ColorChangeshitForeGround.color = Color.Black;
+				Program.UIBackGroundColor.color = Color.White;
+				Program.UITextColor.color = Color.Black;
 			}
 		}
+		#endregion
 	}
 }

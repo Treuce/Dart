@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System.Diagnostics;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace DaRT
@@ -65,9 +66,13 @@ namespace DaRT
 			this.allowMessages = new System.Windows.Forms.CheckBox();
 			this.logTabs = new System.Windows.Forms.TabControl();
 			this.tabAll = new System.Windows.Forms.TabPage();
+			this.all = new DaRT.ExtendedRichTextBox();
 			this.tabConsole = new System.Windows.Forms.TabPage();
+			this.console = new DaRT.ExtendedRichTextBox();
 			this.tabChat = new System.Windows.Forms.TabPage();
+			this.chat = new DaRT.ExtendedRichTextBox();
 			this.tabLog = new System.Windows.Forms.TabPage();
+			this.logs = new DaRT.ExtendedRichTextBox();
 			this.search = new System.Windows.Forms.TextBox();
 			this.searchButton = new System.Windows.Forms.Button();
 			this.autoRefresh = new System.Windows.Forms.CheckBox();
@@ -77,10 +82,6 @@ namespace DaRT
 			this.banner = new System.Windows.Forms.PictureBox();
 			this.options = new System.Windows.Forms.ComboBox();
 			this.timer = new System.Windows.Forms.Timer(this.components);
-			this.all = new DaRT.ExtendedRichTextBox();
-			this.console = new DaRT.ExtendedRichTextBox();
-			this.chat = new DaRT.ExtendedRichTextBox();
-			this.logs = new DaRT.ExtendedRichTextBox();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
 			this.splitContainer1.Panel1.SuspendLayout();
 			this.splitContainer1.Panel2.SuspendLayout();
@@ -150,7 +151,6 @@ namespace DaRT
 			// hosts
 			// 
 			this.hosts.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.hosts.Enabled = true;
 			this.hosts.Location = new System.Drawing.Point(9, 452);
 			this.hosts.Name = "hosts";
 			this.hosts.Size = new System.Drawing.Size(120, 32);
@@ -514,6 +514,20 @@ namespace DaRT
 			this.tabAll.TabIndex = 0;
 			this.tabAll.Text = "All";
 			// 
+			// all
+			// 
+			this.all.BorderStyle = System.Windows.Forms.BorderStyle.None;
+			this.all.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.all.Font = new System.Drawing.Font("Segoe UI", 8.5F);
+			this.all.Location = new System.Drawing.Point(0, 0);
+			this.all.Margin = new System.Windows.Forms.Padding(0);
+			this.all.Name = "all";
+			this.all.ReadOnly = true;
+			this.all.Size = new System.Drawing.Size(1041, 178);
+			this.all.TabIndex = 1;
+			this.all.Text = "";
+			this.all.MouseDown += new System.Windows.Forms.MouseEventHandler(this.console_MouseDown);
+			// 
 			// tabConsole
 			// 
 			this.tabConsole.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
@@ -523,6 +537,20 @@ namespace DaRT
 			this.tabConsole.Size = new System.Drawing.Size(1043, 180);
 			this.tabConsole.TabIndex = 1;
 			this.tabConsole.Text = "Console";
+			// 
+			// console
+			// 
+			this.console.BorderStyle = System.Windows.Forms.BorderStyle.None;
+			this.console.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.console.Font = new System.Drawing.Font("Segoe UI", 8.5F);
+			this.console.Location = new System.Drawing.Point(0, 0);
+			this.console.Margin = new System.Windows.Forms.Padding(0);
+			this.console.Name = "console";
+			this.console.ReadOnly = true;
+			this.console.Size = new System.Drawing.Size(1041, 178);
+			this.console.TabIndex = 2;
+			this.console.Text = "";
+			this.console.MouseDown += new System.Windows.Forms.MouseEventHandler(this.console_MouseDown);
 			// 
 			// tabChat
 			// 
@@ -534,6 +562,20 @@ namespace DaRT
 			this.tabChat.TabIndex = 2;
 			this.tabChat.Text = "Chat";
 			// 
+			// chat
+			// 
+			this.chat.BorderStyle = System.Windows.Forms.BorderStyle.None;
+			this.chat.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.chat.Font = new System.Drawing.Font("Segoe UI", 8.5F);
+			this.chat.Location = new System.Drawing.Point(0, 0);
+			this.chat.Margin = new System.Windows.Forms.Padding(0);
+			this.chat.Name = "chat";
+			this.chat.ReadOnly = true;
+			this.chat.Size = new System.Drawing.Size(1041, 178);
+			this.chat.TabIndex = 3;
+			this.chat.Text = "";
+			this.chat.MouseDown += new System.Windows.Forms.MouseEventHandler(this.console_MouseDown);
+			// 
 			// tabLog
 			// 
 			this.tabLog.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
@@ -543,6 +585,20 @@ namespace DaRT
 			this.tabLog.Size = new System.Drawing.Size(1043, 180);
 			this.tabLog.TabIndex = 3;
 			this.tabLog.Text = "Log";
+			// 
+			// logs
+			// 
+			this.logs.BorderStyle = System.Windows.Forms.BorderStyle.None;
+			this.logs.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.logs.Font = new System.Drawing.Font("Segoe UI", 8.5F);
+			this.logs.Location = new System.Drawing.Point(0, 0);
+			this.logs.Margin = new System.Windows.Forms.Padding(0);
+			this.logs.Name = "logs";
+			this.logs.ReadOnly = true;
+			this.logs.Size = new System.Drawing.Size(1041, 178);
+			this.logs.TabIndex = 3;
+			this.logs.Text = "";
+			this.logs.MouseDown += new System.Windows.Forms.MouseEventHandler(this.console_MouseDown);
 			// 
 			// search
 			// 
@@ -625,10 +681,10 @@ namespace DaRT
 			this.banner.ImageLocation = "";
 			this.banner.Location = new System.Drawing.Point(734, 215);
 			this.banner.Name = "banner";
-			this.banner.Visible = false;
 			this.banner.Size = new System.Drawing.Size(350, 20);
 			this.banner.TabIndex = 10;
 			this.banner.TabStop = false;
+			this.banner.Visible = false;
 			this.banner.Click += new System.EventHandler(this.banner_Click);
 			// 
 			// options
@@ -649,140 +705,91 @@ namespace DaRT
 			// 
 			this.timer.Interval = 1000;
 			this.timer.Tick += new System.EventHandler(this.timer_Tick);
-			// 
-			// all
-			// 
-			this.all.BorderStyle = System.Windows.Forms.BorderStyle.None;
-			this.all.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.all.Font = new System.Drawing.Font("Segoe UI", 8.5F);
-			this.all.Location = new System.Drawing.Point(0, 0);
-			this.all.Margin = new System.Windows.Forms.Padding(0);
-			this.all.Name = "all";
-			this.all.ReadOnly = true;
-			this.all.Size = new System.Drawing.Size(1041, 178);
-			this.all.TabIndex = 1;
-			this.all.Text = "";
-			this.all.MouseDown += new System.Windows.Forms.MouseEventHandler(this.console_MouseDown);
-			// 
-			// console
-			// 
-			this.console.BorderStyle = System.Windows.Forms.BorderStyle.None;
-			this.console.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.console.Font = new System.Drawing.Font("Segoe UI", 8.5F);
-			this.console.Location = new System.Drawing.Point(0, 0);
-			this.console.Margin = new System.Windows.Forms.Padding(0);
-			this.console.Name = "console";
-			this.console.ReadOnly = true;
-			this.console.Size = new System.Drawing.Size(1062, 178);
-			this.console.TabIndex = 2;
-			this.console.Text = "";
-			this.console.MouseDown += new System.Windows.Forms.MouseEventHandler(this.console_MouseDown);
-			// 
-			// chat
-			// 
-			this.chat.BorderStyle = System.Windows.Forms.BorderStyle.None;
-			this.chat.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.chat.Font = new System.Drawing.Font("Segoe UI", 8.5F);
-			this.chat.Location = new System.Drawing.Point(0, 0);
-			this.chat.Margin = new System.Windows.Forms.Padding(0);
-			this.chat.Name = "chat";
-			this.chat.ReadOnly = true;
-			this.chat.Size = new System.Drawing.Size(1062, 178);
-			this.chat.TabIndex = 3;
-			this.chat.Text = "";
-			this.chat.MouseDown += new System.Windows.Forms.MouseEventHandler(this.console_MouseDown);
-			// 
-			// logs
-			// 
-			this.logs.BorderStyle = System.Windows.Forms.BorderStyle.None;
-			this.logs.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.logs.Font = new System.Drawing.Font("Segoe UI", 8.5F);
-			this.logs.Location = new System.Drawing.Point(0, 0);
-			this.logs.Margin = new System.Windows.Forms.Padding(0);
-			this.logs.Name = "logs";
-			this.logs.ReadOnly = true;
-			this.logs.Size = new System.Drawing.Size(1041, 178);
-			this.logs.TabIndex = 3;
-			this.logs.Text = "";
-			this.logs.MouseDown += new System.Windows.Forms.MouseEventHandler(this.console_MouseDown);
-			// 
-			// GUImain
-			// 
 			// Dark mode shit fml
-			this.DataBindings.Add(new Binding("BackColor", Program.ColorChangeshitBackGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.adminCounter.DataBindings.Add(new Binding("ForeColor", Program.ColorChangeshitForeGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.allowMessages.DataBindings.Add(new Binding("ForeColor", Program.ColorChangeshitForeGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.autoRefresh.DataBindings.Add(new Binding("ForeColor", Program.ColorChangeshitForeGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.banCounter.DataBindings.Add(new Binding("ForeColor", Program.ColorChangeshitForeGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.chat.DataBindings.Add(new Binding("BackColor", Program.ColorChangeshitBackGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.adminCounter.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.allowMessages.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.autoRefresh.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.banCounter.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.chat.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
 			//this.chatContextMenu.DataBindings.Add(new Binding("ForeColor", Program.ColorChangeshitBackGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
 			//this.adminCounter.Add(new Binding("")
-			this.connect.DataBindings.Add(new Binding("BackColor", Program.ColorChangeshitBackGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.connect.DataBindings.Add(new Binding("ForeColor", Program.ColorChangeshitForeGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.console.DataBindings.Add(new Binding("BackColor", Program.ColorChangeshitBackGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.console.DataBindings.Add(new Binding("ForeColor", Program.ColorChangeshitForeGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.counter.DataBindings.Add(new Binding("ForeColor", Program.ColorChangeshitForeGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.connect.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.connect.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.console.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.console.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.counter.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
 			//this.executeContextMenu.DataBindings.Add(new Binding("BackColor", Program.ColorChangeshitBackGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.filter.DataBindings.Add(new Binding("ForeColor", Program.ColorChangeshitForeGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.filter.DataBindings.Add(new Binding("BackColor", Program.ColorChangeshitBackGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.host.DataBindings.Add(new Binding("BackColor", Program.ColorChangeshitBackGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.host.DataBindings.Add(new Binding("ForeColor", Program.ColorChangeshitForeGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.hostLabel.DataBindings.Add(new Binding("ForeColor", Program.ColorChangeshitForeGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.hosts.DataBindings.Add(new Binding("ForeColor", Program.ColorChangeshitForeGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.hosts.DataBindings.Add(new Binding("BackColor", Program.ColorChangeshitBackGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.input.DataBindings.Add(new Binding("BackColor", Program.ColorChangeshitBackGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.input.DataBindings.Add(new Binding("ForeColor", Program.ColorChangeshitForeGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.lastRefresh.DataBindings.Add(new Binding("ForeColor", Program.ColorChangeshitForeGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.password.DataBindings.Add(new Binding("ForeColor", Program.ColorChangeshitForeGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.password.DataBindings.Add(new Binding("BackColor", Program.ColorChangeshitBackGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.passwordLabel.DataBindings.Add(new Binding("ForeColor", Program.ColorChangeshitForeGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.playerCounter.DataBindings.Add(new Binding("ForeColor", Program.ColorChangeshitForeGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.playerCounter.DataBindings.Add(new Binding("BackColor",Program.ColorChangeshitBackGround,"color",false,DataSourceUpdateMode.OnPropertyChanged));
-			this.port.DataBindings.Add(new Binding("ForeColor", Program.ColorChangeshitForeGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.port.DataBindings.Add(new Binding("BackColor", Program.ColorChangeshitBackGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.portLabel.DataBindings.Add(new Binding("ForeColor", Program.ColorChangeshitForeGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.portLabel.DataBindings.Add(new Binding("BackColor", Program.ColorChangeshitBackGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.refresh.DataBindings.Add(new Binding("BackColor", Program.ColorChangeshitBackGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.refresh.DataBindings.Add(new Binding("ForeColor", Program.ColorChangeshitForeGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.searchButton.DataBindings.Add(new Binding("ForeColor", Program.ColorChangeshitForeGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.searchButton.DataBindings.Add(new Binding("BackColor", Program.ColorChangeshitBackGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.search.DataBindings.Add(new Binding("BackColor", Program.ColorChangeshitBackGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.search.DataBindings.Add(new Binding("ForeColor", Program.ColorChangeshitForeGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.searchLabel.DataBindings.Add(new Binding("ForeColor", Program.ColorChangeshitForeGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.searchLabel.DataBindings.Add(new Binding("BackColor", Program.ColorChangeshitBackGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.settings.DataBindings.Add(new Binding("BackColor", Program.ColorChangeshitBackGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.settings.DataBindings.Add(new Binding("ForeColor", Program.ColorChangeshitForeGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.splitContainer1.DataBindings.Add(new Binding("BackColor", Program.ColorChangeshitBackGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.splitContainer1.DataBindings.Add(new Binding("ForeColor", Program.ColorChangeshitForeGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.splitContainer2.DataBindings.Add(new Binding("BackColor", Program.ColorChangeshitBackGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.splitContainer2.DataBindings.Add(new Binding("ForeColor", Program.ColorChangeshitForeGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.tabAll.DataBindings.Add(new Binding("ForeColor", Program.ColorChangeshitForeGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.tabAll.DataBindings.Add(new Binding("BackColor", Program.ColorChangeshitBackGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.tabChat.DataBindings.Add(new Binding("ForeColor", Program.ColorChangeshitForeGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.tabChat.DataBindings.Add(new Binding("BackColor", Program.ColorChangeshitBackGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.tabConsole.DataBindings.Add(new Binding("ForeColor", Program.ColorChangeshitForeGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.tabConsole.DataBindings.Add(new Binding("BackColor", Program.ColorChangeshitBackGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.tabPage1.DataBindings.Add(new Binding("ForeColor", Program.ColorChangeshitForeGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.tabPage1.DataBindings.Add(new Binding("BackColor", Program.ColorChangeshitBackGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.tabLog.DataBindings.Add(new Binding("ForeColor", Program.ColorChangeshitForeGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.tabLog.DataBindings.Add(new Binding("BackColor", Program.ColorChangeshitBackGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.execute.DataBindings.Add(new Binding("BackColor", Program.ColorChangeshitBackGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.execute.DataBindings.Add(new Binding("ForeColor", Program.ColorChangeshitForeGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.disconnect.DataBindings.Add(new Binding("ForeColor", Program.ColorChangeshitForeGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.disconnect.DataBindings.Add(new Binding("BackColor", Program.ColorChangeshitBackGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.button1.DataBindings.Add(new Binding("ForeColor", Program.ColorChangeshitForeGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.button1.DataBindings.Add(new Binding("BackColor", Program.ColorChangeshitBackGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			AdminsTab.Controls[0].DataBindings.Add(new Binding("BackColor", Program.ColorChangeshitBackGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			AdminsTab.Controls[1].DataBindings.Add(new Binding("BackColor", Program.ColorChangeshitBackGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			AdminsTab.Controls[2].DataBindings.Add(new Binding("BackColor", Program.ColorChangeshitBackGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			//AdminsTab.Controls[3].DataBindings.Add(new Binding("BackColor", Program.ColorChangeshitBackGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			AdminsTab.Controls[0].DataBindings.Add(new Binding("ForeColor", Program.ColorChangeshitForeGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			AdminsTab.Controls[1].DataBindings.Add(new Binding("ForeColor", Program.ColorChangeshitForeGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			AdminsTab.Controls[2].DataBindings.Add(new Binding("ForeColor", Program.ColorChangeshitForeGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			//AdminsTab.Controls[3].DataBindings.Add(new Binding("ForeColor", Program.ColorChangeshitForeGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.playerList.DataBindings.Add(new Binding("ForeColor", Program.ColorChangeshitForeGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			this.playerList.DataBindings.Add(new Binding("BackColor", Program.ColorChangeshitBackGround, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-			
+			this.filter.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.filter.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.host.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.host.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.hostLabel.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.hosts.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.hosts.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.input.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.input.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.lastRefresh.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.password.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.password.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.passwordLabel.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.playerCounter.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.playerCounter.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.port.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.port.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.portLabel.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.portLabel.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.refresh.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.refresh.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.searchButton.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.searchButton.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.search.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.search.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.searchLabel.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.searchLabel.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.settings.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.settings.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.splitContainer1.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.splitContainer1.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.splitContainer2.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.splitContainer2.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.tabAll.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.tabAll.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.tabChat.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.tabChat.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.tabConsole.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.tabConsole.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.tabPage1.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.tabPage1.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.tabLog.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.tabLog.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.execute.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.execute.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.disconnect.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.disconnect.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.button1.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.button1.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			AdminsTab.Controls[0].DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			AdminsTab.Controls[1].DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			AdminsTab.Controls[2].DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			AdminsTab.Controls[0].DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			AdminsTab.Controls[1].DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			AdminsTab.Controls[2].DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.playerList.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.playerList.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.tabAll.Controls[0].DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.tabAll.Controls[0].DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.logs.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.logs.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.bansList.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.bansList.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.playerDBList.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.playerDBList.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+
+			// 
+			// GUI Main
+			// 
+			this.AutoScaleDimensions = new System.Drawing.SizeF(120F, 120F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
 			this.ClientSize = new System.Drawing.Size(1229, 571);
 			this.Controls.Add(this.splitContainer1);
@@ -792,7 +799,6 @@ namespace DaRT
 			this.Name = "GUImain";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "UK111 Rcon";
-			
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.GUI_FormClosing);
 			this.Load += new System.EventHandler(this.GUI_Load);
 			this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.GUI_KeyDown);
@@ -863,6 +869,7 @@ namespace DaRT
 		private System.Windows.Forms.TabControl AdminsTab;
 		private System.Windows.Forms.TabPage playersTab;
 		private System.Windows.Forms.ListView playerList;
+		private System.Windows.Forms.ListView adminList;
 		private System.Windows.Forms.TabPage bansTab;
 		private System.Windows.Forms.ListView bansList;
 		private System.Windows.Forms.TabPage playerdatabaseTab;
