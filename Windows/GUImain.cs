@@ -3848,8 +3848,8 @@ namespace DaRT
 			}
 			else
 			{
-				Program.UIBackGroundColor.color = Color.Black;
-				Program.UITextColor.color = Color.White;
+				Program.UIBackGroundColor.color = Color.White;
+				Program.UITextColor.color = Color.Black;
 			}
 		}
 		#endregion

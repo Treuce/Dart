@@ -1,4 +1,6 @@
-﻿namespace DaRT
+﻿using System.Windows.Forms;
+
+namespace DaRT
 {
     partial class GUIcomment
     {
@@ -66,10 +68,20 @@
             this.ResumeLayout(false);
             this.PerformLayout();
 
+
+            this.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+            this.apply.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+            this.input.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+            this.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+            this.apply.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+            this.input.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+
+
         }
 
         #endregion
 
+        
         private System.Windows.Forms.TextBox input;
         private System.Windows.Forms.Button apply;
     }
