@@ -217,9 +217,9 @@ namespace DaRT
             Process.Start("http://forums.dayzgame.com/index.php?/topic/68933-dart-a-lightweight-dayz-rcon-tool-v101-26062013/?p=658483");
         }
 
-        private void dart_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        private void treuce_github(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            Process.Start("https://github.com/DomiStyle/DaRT");
+            Process.Start("https://github.com/Treuce/Dart");
         }
         private void battlenet_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {

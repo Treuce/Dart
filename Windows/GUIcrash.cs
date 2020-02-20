@@ -23,7 +23,7 @@ namespace DaRT
             PerformanceCounter memUsage = new PerformanceCounter("memory", "Available MBytes");
 
             exception.Text += "---------- Info ----------\r\n";
-            exception.Text += "UK111 " + "\r\n";
+            exception.Text += "Rcon " + "\r\n";
             exception.Text += "Time of crash: " + System.DateTime.Now + "\r\n";
             exception.Text += "Total used memory: " + p.PrivateMemorySize64 / 1024 / 1024 + " MB / " + memUsage.NextValue() + " MB\r\n";
             exception.Text += "Threads: " + p.Threads.Count + "\r\n";

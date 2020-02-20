@@ -823,7 +823,7 @@ namespace DaRT
 			this.MinimumSize = new System.Drawing.Size(1000, 610);
 			this.Name = "GUImain";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-			this.Text = "UK111 Rcon";
+			this.Text = "Rcon Client";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.GUI_FormClosing);
 			this.Load += new System.EventHandler(this.GUI_Load);
 			this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.GUI_KeyDown);

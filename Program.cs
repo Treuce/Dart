@@ -157,7 +157,7 @@ namespace DaRT
 				if (output != "")
 					writer = File.CreateText(output);
 
-				Write("UK111 - DayZ RCon Tool");
+				Write("DayZ RCon Tool - Started for UK 111 Server");
 				if (command != "")
 					Write("Running in command mode.");
 				else if (script != "")
