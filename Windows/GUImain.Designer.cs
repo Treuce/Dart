@@ -32,6 +32,7 @@ namespace DaRT
 		/// </summary>
 		private void InitializeComponent()
 		{
+			#region Init
 			this.components = new System.ComponentModel.Container();
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(GUImain));
 			this.splitContainer1 = new System.Windows.Forms.SplitContainer();
@@ -106,8 +107,9 @@ namespace DaRT
 			this.tabLog.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.banner)).BeginInit();
 			this.SuspendLayout();
+			#endregion
 			// 
-			// splitContainer1
+			#region splitContainer1
 			// 
 			this.splitContainer1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
 			| System.Windows.Forms.AnchorStyles.Left) 
@@ -141,9 +143,11 @@ namespace DaRT
 			this.splitContainer1.Size = new System.Drawing.Size(1230, 571);
 			this.splitContainer1.SplitterDistance = 139;
 			this.splitContainer1.TabIndex = 0;
+			#endregion
 			// 
 			// button1
 			// 
+			#region DarkMode
 			this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.button1.Location = new System.Drawing.Point(9, 414);
 			this.button1.Name = "button1";
@@ -152,9 +156,11 @@ namespace DaRT
 			this.button1.Text = "Dark/Light Theme";
 			this.button1.UseVisualStyleBackColor = true;
 			this.button1.Click += new System.EventHandler(this.DarkModeToggle);
+			#endregion
 			// 
 			// hosts
 			// 
+			#region Hosts
 			this.hosts.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.hosts.Location = new System.Drawing.Point(9, 452);
 			this.hosts.Name = "hosts";
@@ -162,7 +168,9 @@ namespace DaRT
 			this.hosts.TabIndex = 22;
 			this.hosts.Text = "Load Servers";
 			this.hosts.UseVisualStyleBackColor = true;
+			#endregion
 			// 
+			#region Execute
 			// execute
 			// 
 			this.execute.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
@@ -174,7 +182,9 @@ namespace DaRT
 			this.execute.Text = "Execute...";
 			this.execute.UseVisualStyleBackColor = true;
 			this.execute.Click += new System.EventHandler(this.execute_Click);
+			#endregion
 			// 
+			#region Settings
 			// settings
 			// 
 			this.settings.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
@@ -185,7 +195,9 @@ namespace DaRT
 			this.settings.Text = "Settings";
 			this.settings.UseVisualStyleBackColor = true;
 			this.settings.Click += new System.EventHandler(this.settings_Click);
+			#endregion
 			// 
+			#region Refresh
 			// lastRefresh
 			// 
 			this.lastRefresh.AutoSize = true;
@@ -194,7 +206,7 @@ namespace DaRT
 			this.lastRefresh.Size = new System.Drawing.Size(135, 17);
 			this.lastRefresh.TabIndex = 12;
 			this.lastRefresh.Text = "Last refresh: 0s ago";
-			// 
+			
 			// refresh
 			// 
 			this.refresh.Enabled = false;
@@ -205,7 +217,11 @@ namespace DaRT
 			this.refresh.Text = "Refresh (F5)";
 			this.refresh.UseVisualStyleBackColor = true;
 			this.refresh.Click += new System.EventHandler(this.refresh_Click);
-			// 
+
+			#endregion    // 
+
+
+			#region Disconnect/connect
 			// disconnect
 			// 
 			this.disconnect.Enabled = false;
@@ -226,7 +242,9 @@ namespace DaRT
 			this.connect.Text = "Connect";
 			this.connect.UseVisualStyleBackColor = true;
 			this.connect.Click += new System.EventHandler(this.connect_Click);
+			#endregion
 			// 
+			#region Password
 			// password
 			// 
 			this.password.Location = new System.Drawing.Point(9, 115);
@@ -244,7 +262,9 @@ namespace DaRT
 			this.passwordLabel.TabIndex = 4;
 			this.passwordLabel.Text = "Password";
 			this.passwordLabel.TextAlign = System.Drawing.ContentAlignment.TopCenter;
-			// 
+
+			#endregion         // 
+			#region Port/Host
 			// portLabel
 			// 
 			this.portLabel.AutoSize = true;
@@ -278,7 +298,10 @@ namespace DaRT
 			this.host.Name = "host";
 			this.host.Size = new System.Drawing.Size(120, 22);
 			this.host.TabIndex = 0;
+			#endregion
 			// 
+			#region SplitContainer2
+
 			// splitContainer2
 			// 
 			this.splitContainer2.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -312,7 +335,9 @@ namespace DaRT
 			this.splitContainer2.Size = new System.Drawing.Size(1087, 571);
 			this.splitContainer2.SplitterDistance = 329;
 			this.splitContainer2.TabIndex = 21;
-			// 
+
+			#endregion// 
+			#region Admins/PlayersTab
 			// AdminsTab
 			// 
 			this.AdminsTab.Controls.Add(this.playersTab);
@@ -330,7 +355,7 @@ namespace DaRT
 			// 
 			// playersTab
 			// 
-			
+
 			this.playersTab.Controls.Add(this.playerList);
 			this.playersTab.Location = new System.Drawing.Point(4, 25);
 			this.playersTab.Name = "playersTab";
@@ -338,12 +363,14 @@ namespace DaRT
 			this.playersTab.TabIndex = 0;
 			this.playersTab.Text = "Players";
 			this.playersTab.UseVisualStyleBackColor = true;
-			// 
+
+			#endregion// 
 			// playerList
-			// 
+			#region PlayerList/GlobalBanlist
+
 			this.playerList.AllowColumnReorder = true;
-			this.playerList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-			| System.Windows.Forms.AnchorStyles.Left) 
+			this.playerList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+			| System.Windows.Forms.AnchorStyles.Left)
 			| System.Windows.Forms.AnchorStyles.Right)));
 			this.playerList.BorderStyle = System.Windows.Forms.BorderStyle.None;
 			this.playerList.FullRowSelect = true;
@@ -413,7 +440,9 @@ namespace DaRT
 			this.globalbans.Size = new System.Drawing.Size(1079, 300);
 			this.globalbans.TabIndex = 1;
 			this.globalbans.Text = "Global Bans";
+			#endregion
 
+			#region Bans
 			// 
 			// bansTab
 			// 
@@ -444,7 +473,9 @@ namespace DaRT
 			this.bansList.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.bansList_ColumnClick);
 			this.bansList.RetrieveVirtualItem += new System.Windows.Forms.RetrieveVirtualItemEventHandler(this.bansList_RetrieveVirtualItem);
 			this.bansList.MouseDown += new System.Windows.Forms.MouseEventHandler(this.bansList_MouseDown);
-			// 
+			//  
+			#endregion
+			#region PlayerDB
 			// playerdatabaseTab
 			// 
 			this.playerdatabaseTab.Controls.Add(this.playerDBList);
@@ -474,7 +505,8 @@ namespace DaRT
 			this.playerDBList.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.playerDBList_ColumnClick);
 			this.playerDBList.RetrieveVirtualItem += new System.Windows.Forms.RetrieveVirtualItemEventHandler(this.playerDBList_RetrieveVirtualItem);
 			this.playerDBList.MouseDown += new System.Windows.Forms.MouseEventHandler(this.playerDBList_MouseDown);
-			// 
+			//  
+			#endregion
 			// tabPage1
 			// 
 			this.AdminListTab.Location = new System.Drawing.Point(4, 25);
@@ -484,6 +516,8 @@ namespace DaRT
 			this.AdminListTab.TabIndex = 3;
 			this.AdminListTab.Text = "Admins";
 			this.AdminListTab.UseVisualStyleBackColor = true;
+
+			#region Counters
 			// 
 			// playerCounter
 			// 
@@ -532,7 +566,8 @@ namespace DaRT
 			this.counter.TabIndex = 1;
 			this.counter.Text = "0/400";
 			this.counter.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
+			//  
+			#endregion
 			// allowMessages
 			// 
 			this.allowMessages.AutoSize = true;
@@ -546,11 +581,12 @@ namespace DaRT
 			this.allowMessages.UseVisualStyleBackColor = true;
 			this.allowMessages.CheckedChanged += new System.EventHandler(this.autoScroll_CheckedChanged);
 			// 
+			#region Chat and stuff
 			// logTabs
 			// 
 			this.logTabs.Alignment = System.Windows.Forms.TabAlignment.Left;
-			this.logTabs.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-			| System.Windows.Forms.AnchorStyles.Left) 
+			this.logTabs.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+			| System.Windows.Forms.AnchorStyles.Left)
 			| System.Windows.Forms.AnchorStyles.Right)));
 			this.logTabs.Controls.Add(this.tabAll);
 			this.logTabs.Controls.Add(this.tabConsole);
@@ -662,7 +698,9 @@ namespace DaRT
 			this.logs.TabIndex = 3;
 			this.logs.Text = "";
 			this.logs.MouseDown += new System.Windows.Forms.MouseEventHandler(this.console_MouseDown);
-			// 
+			//  
+			#endregion
+			#region Search/Filter
 			// search
 			// 
 			this.search.Location = new System.Drawing.Point(196, 1);
@@ -692,6 +730,7 @@ namespace DaRT
 			this.autoRefresh.Text = "Auto Refresh";
 			this.autoRefresh.UseVisualStyleBackColor = true;
 			// 
+			
 			// filter
 			// 
 			this.filter.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -709,12 +748,14 @@ namespace DaRT
 			this.searchLabel.Name = "searchLabel";
 			this.searchLabel.Size = new System.Drawing.Size(57, 17);
 			this.searchLabel.TabIndex = 12;
-			this.searchLabel.Text = "Search:";
+			this.searchLabel.Text = "Search:"; 
+			#endregion
 			// 
 			// input
 			// 
-			this.input.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-			| System.Windows.Forms.AnchorStyles.Right)));
+			#region Input
+			this.input.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
+				| System.Windows.Forms.AnchorStyles.Right)));
 			this.input.AutoCompleteCustomSource.AddRange(new string[] {
 			"ban",
 			"addBan",
@@ -737,24 +778,19 @@ namespace DaRT
 			this.input.TabIndex = 2;
 			this.input.TextChanged += new System.EventHandler(this.input_TextChanged);
 			this.input.KeyDown += new System.Windows.Forms.KeyEventHandler(this.input_KeyDown);
-			// 
-			// banner
-			// 
-			this.banner.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.banner.ImageLocation = "";
-			this.banner.Location = new System.Drawing.Point(734, 215);
-			this.banner.Name = "banner";
-			this.banner.Size = new System.Drawing.Size(350, 20);
-			this.banner.TabIndex = 10;
-			this.banner.TabStop = false;
-			this.banner.Visible = false;
-			this.banner.Click += new System.EventHandler(this.banner_Click);
-			// 
+
+			#endregion
+			#region Options
+
 			// options
 			// 
 			this.options.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.options.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.options.FormattingEnabled = true;
+			this.options.Visible = true;
+			this.options.Enabled = true;
+			this.options.BringToFront();
+			this.options.ResumeLayout();
 			this.options.Items.AddRange(new object[] {
 			"Say Global",
 			"Console"});
@@ -762,12 +798,14 @@ namespace DaRT
 			this.options.Name = "options";
 			this.options.Size = new System.Drawing.Size(86, 24);
 			this.options.TabIndex = 3;
-			this.options.SelectedIndexChanged += new System.EventHandler(this.options_SelectedIndexChanged);
+			this.options.SelectedIndexChanged += new System.EventHandler(this.options_SelectedIndexChanged); 
+			#endregion
 			// 
 			// timer
 			// 
-			this.timer.Interval = 1000;
-			this.timer.Tick += new System.EventHandler(this.timer_Tick);
+			//this.timer.Interval = 1000;
+			//this.timer.Tick += new System.EventHandler(this.timer_Tick);
+			#region DataBindings
 			// Dark mode shit fml
 			this.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
 			this.adminCounter.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
@@ -852,6 +890,8 @@ namespace DaRT
 			this.adminList.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
 			this.globalbans.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
 			this.globalbans.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			#endregion
+			#region GUI Main
 			// 
 			// GUI Main
 			// 
@@ -890,11 +930,11 @@ namespace DaRT
 			this.tabLog.ResumeLayout(false);
 			((System.ComponentModel.ISupportInitialize)(this.banner)).EndInit();
 			this.ResumeLayout(false);
-
+			#endregion
 		}
 
-		#endregion
-
+#endregion
+		#region Variables
 		private System.Windows.Forms.SplitContainer splitContainer1;
 		private System.Windows.Forms.Label passwordLabel;
 		private System.Windows.Forms.Label portLabel;
@@ -946,6 +986,7 @@ namespace DaRT
 		private System.Windows.Forms.Button button1;
 		private System.Windows.Forms.Button hosts;
 		private ListView globalbanlist;
+		#endregion
 	}
 }
 
