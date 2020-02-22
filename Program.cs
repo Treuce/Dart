@@ -59,7 +59,6 @@ namespace DaRT
 		static String version = "v2.1";
 		public static GUImain gui;
 		static StreamWriter writer;
-
 		#endregion
 
 		[DllImport("kernel32.dll", EntryPoint = "AllocConsole", SetLastError = true, CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
@@ -78,6 +77,7 @@ namespace DaRT
 		[STAThread]
 		static void Main(string[] args)
 		{
+			
 			if (args.Length == 0)
 			{
 				if (Debugger.IsAttached)

@@ -80,7 +80,7 @@ namespace DaRT.Helpers
 			}
 			catch (Exception ex)
 			{
-		
+				Program.gui.Log(ex.Message, LogType.Debug, false);
 			}
 		}
 		#region IP Stuff
@@ -119,6 +119,7 @@ namespace DaRT.Helpers
 			}
 			catch (Exception ex)
 			{
+				Program.gui.Log(ex.Message, LogType.Debug, false);
 				return "";
 			}
 		}
@@ -157,6 +158,7 @@ namespace DaRT.Helpers
 			}
 			catch (Exception ex)
 			{
+				Program.gui.Log(ex.Message, LogType.Debug, false);
 			}
 		}
 		#endregion

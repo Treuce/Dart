@@ -31,7 +31,6 @@ namespace DaRT
             this.name = name;
             this.status = status;
             //this.uid = WebClientAsd.GetUID(guid);
-            bool foundindb = false;
             using (SqliteCommand selectCommand = new SqliteCommand("SELECT uid FROM players WHERE guid = @guid", Program.gui.connection))
             {
                 selectCommand.Parameters.Clear();

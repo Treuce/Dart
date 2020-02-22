@@ -439,7 +439,7 @@ namespace DaRT
         }
         public List<string> getAdmins()
         {
-            int admins = 0;
+            //int admins = 0;
 
             int id = this.Send(BattlEyeCommand.Admins);
 

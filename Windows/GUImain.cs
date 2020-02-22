@@ -534,7 +534,7 @@ namespace DaRT
 
 			this.Log("Disconnected.", LogType.Console, false);
 
-			timer.Stop();
+			//timer.Stop();
 			seconds = 0;
 			minutes = 0;
 			hours = 0;
@@ -1545,23 +1545,6 @@ namespace DaRT
 							//threadAdmins.IsBackground = true;
 							//threadAdmins.Start();
 						}
-						else
-						{
-							// Starting timer
-							this.Invoke((MethodInvoker)delegate
-							{
-								lastRefresh.Text = "Last refresh: 0s ago";
-								seconds = 0;
-								minutes = 0;
-								hours = 0;
-								timer.Start();
-							});
-						}
-
-						// Requesting banner from GameTracker
-						//Thread threadBanner = new Thread(new ThreadStart(thread_Banner));
-						//threadBanner.IsBackground = true;
-						//threadBanner.Start();
 
 						// Setting maximum of refresh timer
 						refreshTimer = Settings.Default.interval;
@@ -1596,7 +1579,7 @@ namespace DaRT
 				this.Invoke((MethodInvoker)delegate
 				{
 					playerContextMenu.Hide();
-					timer.Stop();
+					//timer.Stop();
 					refreshTimer = Settings.Default.interval;
 
 					lastRefresh.Text = "Refreshing...";
@@ -1741,12 +1724,6 @@ namespace DaRT
 						}
 					}
 				}
-
-				this.Invoke((MethodInvoker)delegate
-				{
-					lastRefresh.Text = "Last refresh: 0s ago";
-					timer.Start();
-				});
 
 				pendingPlayers = false;
 			}
@@ -2456,6 +2433,7 @@ namespace DaRT
 
 		public void Log(object message, LogType type, bool important)
 		{
+			// TODO: Add custom filters
 			// Return if logging is not possible
 			if (this.IsDisposed || !this.IsHandleCreated)
 				return;
@@ -2467,7 +2445,7 @@ namespace DaRT
 				{
 					FlashWindow.Flash(this);
 				});
-				SystemSounds.Beep.Play();
+				SystemSounds.Hand.Play();
 			}
 
 			// Save log to file if necessary
@@ -2847,7 +2825,7 @@ namespace DaRT
 				}
 				if (hours >= 60)
 				{
-					timer.Stop();
+					//timer.Stop();
 					lastRefresh.Text = "Last refresh: 60h+ ago";
 				}
 				else
