@@ -692,9 +692,6 @@ namespace DaRT
                             if (Settings.Default.refreshOnJoin && message.EndsWith("disconnected") && !_form.pendingPlayers)
                             {
                                 Task.Run(_form.thread_Player);
-                                //Thread thread = new Thread(new ThreadStart(_form.thread_Player));
-                                //thread.IsBackground = true;
-                                //thread.Start();
                             }
 
                             // Connect/disconnect/kick/ban messages
@@ -710,9 +707,6 @@ namespace DaRT
                             if (Settings.Default.refreshOnJoin && !_form.pendingPlayers)
                             {
                                 Task.Run(_form.thread_Player);
-                                //Thread thread = new Thread(new ThreadStart(_form.thread_Player));
-                                //thread.IsBackground = true;
-                                //thread.Start();
                             }
                         }
                         else if (message.StartsWith("RCon admin #"))

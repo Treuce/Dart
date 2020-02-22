@@ -110,6 +110,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Management" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -123,10 +124,13 @@
     <Compile Include="Classes\Ban.cs" />
     <Compile Include="Classes\BanIP.cs" />
     <Compile Include="Classes\BanOffline.cs" />
+    <Compile Include="Classes\InfiStarGlobalBan.cs" />
     <Compile Include="Classes\LogItem.cs" />
     <Compile Include="Enums\LogTypes.cs" />
     <Compile Include="Helpers\ColumnSorter.cs" />
+    <Compile Include="Helpers\Ident.cs" />
     <Compile Include="Helpers\WebClient.cs" />
+    <Compile Include="Settings.cs" />
     <Compile Include="Windows\GUImanualBans.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -248,7 +252,7 @@
     </None>
     <None Include="Properties\app.manifest" />
     <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
+      <Generator>PublicSettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <Compile Include="Properties\Settings.Designer.cs">

@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
+using System.Net;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
-using System.Runtime.InteropServices;
-using System.Net;
-using System.Drawing;
-using System.ComponentModel;
-
 namespace DaRT
 {
 
@@ -22,7 +21,7 @@ namespace DaRT
 		private Color mColor;
 		public Color color
 		{
-			get { return mColor; InvokePropertyChanged(new PropertyChangedEventArgs("color")); }
+			get { return mColor; }
 			set
 			{
 				mColor = value;
@@ -36,8 +35,15 @@ namespace DaRT
 
 		public void InvokePropertyChanged(PropertyChangedEventArgs e)
 		{
-			PropertyChangedEventHandler handler = PropertyChanged;
-			if (handler != null) handler(this, e);
+			try
+			{
+				PropertyChangedEventHandler handler = PropertyChanged;
+				if (handler != null) handler(this, e);
+			}
+			catch
+			{
+
+			}
 		}
 
 		#endregion
@@ -48,8 +54,8 @@ namespace DaRT
 	static class Program
 	{
 		#region Variables/Properties
-		public static Sample UIBackGroundColor = new Sample(Color.White);
-		public static Sample UITextColor = new Sample(Color.Black);
+		public static Sample UIBackGroundColor = (DaRT.Properties.Settings.Default.DarkMode) ? new Sample(Color.Black) : new Sample (Color.White);
+		public static Sample UITextColor = (DaRT.Properties.Settings.Default.DarkMode) ? new Sample(Color.White) : new Sample(Color.Black);
 		static String version = "v2.1";
 		public static GUImain gui;
 		static StreamWriter writer;
@@ -133,7 +139,7 @@ namespace DaRT
 					{
 						output = arg.Split(new char[] { '=' }, 2, StringSplitOptions.RemoveEmptyEntries)[1];
 					}
-					else if(arg.StartsWith("-close"))
+					else if (arg.StartsWith("-close"))
 					{
 						close = true;
 					}

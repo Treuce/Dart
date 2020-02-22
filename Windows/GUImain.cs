@@ -16,6 +16,10 @@ using DaRT.Properties;
 using System.Net.Sockets;
 using DaRT.Helpers;
 using System.Threading.Tasks;
+using System.Security.Cryptography;
+using Microsoft.Win32;
+using DaRT.Classes;
+using System.Media;
 
 namespace DaRT
 {
@@ -66,8 +70,9 @@ namespace DaRT
 		private ContextMenuStrip allContextMenu;
 		private ContextMenuStrip consoleContextMenu;
 		private ContextMenuStrip chatContextMenu;
+		private List<InfiStarGlobalBan> GlobalBans;
 		private ContextMenuStrip logContextMenu;
-		private ContextMenuStrip AdminContextMenu;
+		//private ContextMenuStrip AdminContextMenu;
 		private ContextMenuStrip executeContextMenu;
 		private ListViewColumnSorter playerSorter;
 		private ListViewColumnSorter banSorter;
@@ -318,6 +323,12 @@ namespace DaRT
 			this.bansList.ListViewItemSorter = banSorter;
 		}
 
+		private void InitializeGlobalBanList()
+		{
+
+			globalbanlist.Columns.Add("GUID", 300);
+			globalbanlist.Columns.Add("UID", 200);
+		}
 		private void InitializeAdminsList()
 		{
 			// Initializing context menu of ban list
@@ -502,7 +513,7 @@ namespace DaRT
 			disconnect.Enabled = false;
 			connect.Enabled = true;
 			refresh.Enabled = false;
-			input.Enabled = false;
+			//input.Enabled = false;
 			refresh.Enabled = false;
 			host.Enabled = true;
 			port.Enabled = true;
@@ -1185,6 +1196,11 @@ namespace DaRT
 					filter.Items.Add("Comment");
 					filter.SelectedIndex = 0;
 				}
+				else if (AdminsTab.SelectedTab.Text == "Global Bans")
+				{
+					/*Task.Run(() => */
+					getGlobalBans();
+				}
 				else if (AdminsTab.SelectedTab.Text == "Player Database")
 				{
 					// Switching to player database tab
@@ -1257,9 +1273,7 @@ namespace DaRT
 				else if (AdminsTab.SelectedTab.Text == "Admins" && this.rcon.Connected)
 				{
 					search.Enabled = false;
-					//this.adminList.VirtualListSize = 1;
 					Task.Run(thread_Admins);
-					//this.AdminListTab.BackColor = Color.Red;
 				}
 			}
 			catch (Exception e)
@@ -1268,6 +1282,126 @@ namespace DaRT
 				this.Log(e.Message, LogType.Debug, false);
 				this.Log(e.StackTrace, LogType.Debug, false);
 			}
+		}
+
+		private void getGlobalBans()
+		{
+			if (GlobalBans == null || GlobalBans.Count < 1)
+			{
+				var option = "1";
+				GlobalBans = new List<InfiStarGlobalBan>();
+				try
+				{
+					this.Log("Started Loading Bans from InfiStar!" + Environment.NewLine, LogType.Console, false);
+					string str1 = "";
+					using (WebClient client = new WebClient())
+					{
+						string str = Guid.NewGuid().ToString().Replace("-", "");
+						ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072; //TLS 1.2
+						client.Encoding = Encoding.UTF8;
+						client.Headers.Add("user-agent", "infiSTAR RCON");
+						client.Headers.Set("cryptkey", str);
+						client.Headers.Add("version", string.Format("{0}", string.Format("[v{0} infiSTAR.de Update]", 256)));
+						client.Headers.Set("x01", this.EncryptString(this.MachineGuid(), str + "x01"));
+						client.Headers.Add(nameof(option), option);
+						str1 = client.DownloadString("http://brc.infistar.de/" + "dart.php");
+					}
+					string[] tmp = str1.Split('\n');
+					for (int i = 0; i < tmp.Length; i++)
+					{
+						if (tmp[i].Length > 0 && !String.IsNullOrEmpty(tmp[i]))
+							tmp[i] = tmp[i].Substring(0, tmp[i].LastIndexOf('|'));
+					}
+					foreach (string a in tmp)
+					{
+						if (!String.IsNullOrEmpty(a))
+						{
+							var b = a.Split('|');
+							if (b.Length > 1)
+								GlobalBans.Add(new InfiStarGlobalBan(b[0], b[1]));
+							else if (b.Length == 1)
+								GlobalBans.Add(new InfiStarGlobalBan(b[0]));
+							else
+								this.Log("FCK MY LIFE", LogType.Console, false);
+						}
+					}
+
+					//globalbanlist.Clear();
+					for (int i = 0; i < GlobalBans.Count; i++)
+					{
+						String[] items = { GlobalBans[i].guid, GlobalBans[i].uid };
+						ListViewItem item = new ListViewItem(items);
+						globalbanlist.Items.Add(item);
+					}
+					all.AppendText("Loaded " + GlobalBans.Count + " bans from InfiStar!"+Environment.NewLine);
+
+				}
+				catch (Exception e)
+				{
+					this.Log(e.Message, LogType.Console, false);
+					this.Log(e.StackTrace, LogType.Console, false);
+				}
+			}
+			else
+			{
+				//globalbanlist.Clear();
+				for (int i = 0; i < GlobalBans.Count; i++)
+				{
+					String[] items = { GlobalBans[i].guid, GlobalBans[i].uid };
+					ListViewItem item = new ListViewItem(items);
+					globalbanlist.Items.Add(item);
+				}
+				all.AppendText("Loaded " + GlobalBans.Count + " bans from InfiStar!" + Environment.NewLine);
+			}
+		}
+		public string MachineGuid()
+		{
+			string asd = "";
+			try
+			{
+				string name1 = "SOFTWARE\\Microsoft\\Cryptography";
+				string name2 = nameof(MachineGuid);
+				using (RegistryKey registryKey1 = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64))
+				{
+					using (RegistryKey registryKey2 = registryKey1.OpenSubKey(name1))
+					{
+						if (registryKey2 == null)
+							throw new KeyNotFoundException(string.Format("Key Not Found: {0}", (object)name1));
+						object obj = registryKey2.GetValue(name2);
+						if (obj == null)
+							throw new IndexOutOfRangeException(string.Format("Index Not Found: {0}", (object)name2));
+						asd = obj.ToString();
+					}
+				}
+			}
+			catch (Exception e)
+			{
+				this.Log(e.Message, LogType.Debug, false);
+				this.Log(e.StackTrace, LogType.Debug, false);
+			}
+			return asd;
+		}
+		private string EncryptString(string input, string cryptkey)
+		{
+			Aes aes = Aes.Create();
+			aes.Mode = CipherMode.CBC;
+			SHA256 shA256 = SHA256.Create();
+			byte[] numArray1 = new byte[32];
+			Array.Copy((Array)shA256.ComputeHash(Encoding.ASCII.GetBytes("Z2w&9b&nZagJ$CB%WH" + cryptkey)), 0, (Array)numArray1, 0, 32);
+			aes.Key = numArray1;
+			byte[] numArray2 = new byte[16];
+			Array.Copy((Array)shA256.ComputeHash(Encoding.ASCII.GetBytes("")), 0, (Array)numArray2, 0, 16);
+			aes.IV = numArray2;
+			MemoryStream memoryStream = new MemoryStream();
+			ICryptoTransform encryptor = aes.CreateEncryptor();
+			CryptoStream cryptoStream = new CryptoStream((Stream)memoryStream, encryptor, CryptoStreamMode.Write);
+			byte[] bytes = Encoding.ASCII.GetBytes(input);
+			cryptoStream.Write(bytes, 0, bytes.Length);
+			cryptoStream.FlushFinalBlock();
+			byte[] array = memoryStream.ToArray();
+			memoryStream.Close();
+			cryptoStream.Close();
+			return Convert.ToBase64String(array, 0, array.Length);
 		}
 		#endregion
 
@@ -2333,6 +2467,7 @@ namespace DaRT
 				{
 					FlashWindow.Flash(this);
 				});
+				SystemSounds.Beep.Play();
 			}
 
 			// Save log to file if necessary
@@ -2735,7 +2870,7 @@ namespace DaRT
 			{
 				refresh.Enabled = false;
 				execute.Enabled = false;
-				input.Enabled = false;
+				//input.Enabled = false;
 				lastRefresh.Text = "Reconnecting...";
 			}
 		}
@@ -3176,22 +3311,22 @@ namespace DaRT
 			if (logTabs.SelectedIndex == 0)
 			{
 				all.Clear();
-				all.AppendText("DaRT " + version + " initialized!");
+				//all.AppendText("DaRT " + version + " initialized!");
 			}
 			else if (logTabs.SelectedIndex == 1)
 			{
 				console.Clear();
-				console.AppendText("DaRT " + version + " initialized!");
+				//console.AppendText("DaRT " + version + " initialized!");
 			}
 			else if (logTabs.SelectedIndex == 2)
 			{
 				chat.Clear();
-				chat.AppendText("DaRT " + version + " initialized!");
+				//chat.AppendText("DaRT " + version + " initialized!");
 			}
 			else if (logTabs.SelectedIndex == 3)
 			{
 				logs.Clear();
-				logs.AppendText("DaRT " + version + " initialized!");
+				//logs.AppendText("DaRT " + version + " initialized!");
 			}
 		}
 		private void clearAll_click(object sender, EventArgs args)
@@ -3233,7 +3368,7 @@ namespace DaRT
 		}
 		private void GUI_Load(object sender, EventArgs args)
 		{
-
+			InitializeGlobalBanList();
 			InitializeSplitter();
 			InitializeText();
 			InitializeDatabase();
@@ -3245,6 +3380,7 @@ namespace DaRT
 			InitializeAdminsList();
 			InitializeFunctions();
 			InitializeConsole();
+
 			InitializeBanner();
 			InitializeProxy();
 
@@ -3850,7 +3986,10 @@ namespace DaRT
 			{
 				Program.UIBackGroundColor.color = Color.White;
 				Program.UITextColor.color = Color.Black;
+
 			}
+			DaRT.Properties.Settings.Default.DarkMode = (DaRT.Properties.Settings.Default.DarkMode) ? false : true;
+			DaRT.Properties.Settings.Default.Save();
 		}
 		#endregion
 	}

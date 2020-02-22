@@ -64,6 +64,8 @@ namespace DaRT
 			this.banCounter = new System.Windows.Forms.Label();
 			this.adminCounter = new System.Windows.Forms.Label();
 			this.counter = new System.Windows.Forms.Label();
+			this.globalbanlist = new ListView();
+			this.globalbans = new TabPage();
 			this.allowMessages = new System.Windows.Forms.CheckBox();
 			this.logTabs = new System.Windows.Forms.TabControl();
 			this.tabAll = new System.Windows.Forms.TabPage();
@@ -317,6 +319,7 @@ namespace DaRT
 			this.AdminsTab.Controls.Add(this.bansTab);
 			this.AdminsTab.Controls.Add(this.playerdatabaseTab);
 			this.AdminsTab.Controls.Add(this.AdminListTab);
+			this.AdminsTab.Controls.Add(this.globalbans);
 			this.AdminsTab.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.AdminsTab.Location = new System.Drawing.Point(0, 0);
 			this.AdminsTab.Name = "AdminsTab";
@@ -374,6 +377,42 @@ namespace DaRT
 			this.adminList.View = System.Windows.Forms.View.Details;
 			this.adminList.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.playerList_ColumnClick);
 			this.adminList.MouseDown += new System.Windows.Forms.MouseEventHandler(this.playerList_MouseDown);
+
+			//Global Ban list
+			this.AdminListTab.Controls.Add(this.globalbanlist);
+			this.globalbanlist.AllowColumnReorder = true;
+			this.globalbanlist.AllowColumnReorder = true;
+			this.globalbanlist.BorderStyle = System.Windows.Forms.BorderStyle.None;
+			this.globalbanlist.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.globalbanlist.FullRowSelect = true;
+			this.globalbanlist.GridLines = true;
+			this.globalbanlist.HideSelection = false;
+			this.globalbanlist.Location = new System.Drawing.Point(0, 0);
+			this.globalbanlist.MultiSelect = false;
+			this.globalbanlist.Name = "GlobalBanList";
+			this.globalbanlist.Size = new System.Drawing.Size(1079, 300);
+			this.globalbanlist.TabIndex = 0;
+			this.globalbanlist.UseCompatibleStateImageBehavior = false;
+			this.globalbanlist.View = System.Windows.Forms.View.Details;
+			//this.globalbanlist.VirtualMode = true;
+			//this.globalbanlist.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.playerDBList_ColumnClick);
+			//this.globalbanlist.RetrieveVirtualItem += new System.Windows.Forms.RetrieveVirtualItemEventHandler(this.playerDBList_RetrieveVirtualItem);
+			//this.globalbanlist.MouseDown += new System.Windows.Forms.MouseEventHandler(this.playerDBList_MouseDown);
+			//this.globalbanlist.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.playerDBList_ColumnClick);
+			//this.globalbanlist.RetrieveVirtualItem += new System.Windows.Forms.RetrieveVirtualItemEventHandler(this.playerDBList_RetrieveVirtualItem);
+			//this.globalbanlist.MouseDown += new System.Windows.Forms.MouseEventHandler(this.playerDBList_MouseDown);
+
+
+			//this.globalbanlist.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.playerList_ColumnClick);
+			//this.globalbanlist.MouseDown += new System.Windows.Forms.MouseEventHandler(this.playerList_MouseDown);
+			this.globalbanlist.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.globalbanlist.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.globalbans.Controls.Add(this.globalbanlist);
+			this.globalbans.Location = new System.Drawing.Point(4, 25);
+			this.globalbans.Name = "globalbansTab";
+			this.globalbans.Size = new System.Drawing.Size(1079, 300);
+			this.globalbans.TabIndex = 1;
+			this.globalbans.Text = "Global Bans";
 
 			// 
 			// bansTab
@@ -811,6 +850,8 @@ namespace DaRT
 			this.playerDBList.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
 			this.adminList.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
 			this.adminList.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.globalbans.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.globalbans.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
 			// 
 			// GUI Main
 			// 
@@ -892,6 +933,7 @@ namespace DaRT
 		public System.Windows.Forms.TextBox search;
 		private System.Windows.Forms.Label counter;
 		private System.Windows.Forms.TabControl AdminsTab;
+		private TabPage globalbans;
 		private System.Windows.Forms.TabPage playersTab;
 		private System.Windows.Forms.ListView playerList;
 		private System.Windows.Forms.ListView adminList;
@@ -903,6 +945,7 @@ namespace DaRT
 		private System.Windows.Forms.CheckBox allowMessages;
 		private System.Windows.Forms.Button button1;
 		private System.Windows.Forms.Button hosts;
+		private ListView globalbanlist;
 	}
 }
 
