@@ -20,6 +20,7 @@ using System.Security.Cryptography;
 using Microsoft.Win32;
 using DaRT.Classes;
 using System.Media;
+using System.Linq;
 
 namespace DaRT
 {
@@ -70,7 +71,7 @@ namespace DaRT
 		private ContextMenuStrip allContextMenu;
 		private ContextMenuStrip consoleContextMenu;
 		private ContextMenuStrip chatContextMenu;
-		private List<InfiStarGlobalBan> GlobalBans;
+		private List<GlobalBan> InfiStarGlobalBans;
 		private ContextMenuStrip logContextMenu;
 		//private ContextMenuStrip AdminContextMenu;
 		private ContextMenuStrip executeContextMenu;
@@ -113,6 +114,13 @@ namespace DaRT
 				connection = new SqliteConnection(@"Data Source=data\db\dart.db");
 				connection.Open();
 
+				//command = new SqliteCommand("DROP TABLE GLOBALBANS",connection);
+				//command.ExecuteNonQuery();
+				//Debugger.Break();
+				using (command = new SqliteCommand("CREATE TABLE IF NOT EXISTS GLOBALBANS (GUID VARCHAR(32) PRIMARY KEY, UID VARCHAR(32))", connection))
+				{
+					command.ExecuteNonQuery();
+				}
 				using (command = new SqliteCommand("CREATE TABLE IF NOT EXISTS players (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, lastip VARCHAR(100) NOT NULL, lastseen VARCHAR(100) NOT NULL,uid VARCHAR(32) NOT NULL, guid VARCHAR(32) NOT NULL, name VARCHAR(100) NOT NULL, lastseenon VARCHAR(20), location VARCHAR(2), synced INTEGER)", connection))
 				{
 					command.ExecuteNonQuery();
@@ -245,6 +253,7 @@ namespace DaRT
 			filter.Items.Add("IP");
 			filter.Items.Add("UID");
 			filter.Items.Add("Comment");
+			filter.Items.Add("Steam Name"); // TODO
 			filter.SelectedIndex = 0;
 		}
 		private void InitializePlayerList()
@@ -410,7 +419,7 @@ namespace DaRT
 		private void InitializeBanner()
 		{
 			// Setting the image in the lower right corner
-			banner.Image = GetImage("Please connect to a server...");
+			//banner.Image = GetImage("Please connect to a server...");
 		}
 		private void InitializeProxy()
 		{
@@ -435,7 +444,6 @@ namespace DaRT
 			tooltip.SetToolTip(refresh, "Refresh the current view.");
 			tooltip.SetToolTip(hosts, "Load previously used hosts.");
 			tooltip.SetToolTip(settings, "Adjust your settings.");
-			tooltip.SetToolTip(banner, "A banner of your server will be shown if your server is registered on GameTracker.\r\nClicking it will bring you to GameTracker.");
 			tooltip.SetToolTip(options, "You can switch between say and console mode here.\r\nWhile in say mode you can use global chat to communicate with your players.\r\nConsole mode allows you to execute RCon commands directly on the server.");
 			tooltip.SetToolTip(execute, "Contains a useful collection of tools.");
 			tooltip.SetToolTip(autoRefresh, "If checked, DaRT will automatically refresh your player list at the interval set on the settings page.");
@@ -449,9 +457,6 @@ namespace DaRT
 			if (!pendingConnect)
 			{
 				Task.Run(thread_Connect);
-				//Thread thread = new Thread(new ThreadStart(thread_Connect));
-				//thread.IsBackground = true;
-				//thread.Start();
 			}
 			else
 				this.Log("DaRT is already connecting. Please wait for it to finish before connecting again.", LogType.Console, false);
@@ -478,11 +483,6 @@ namespace DaRT
 					if (!pendingBans && rcon.Connected)
 					{
 						Task.Run(thread_Bans);
-						//thread.IsBackground = true;
-						//thread.Start();
-						//Thread banner = new Thread(new ThreadStart(thread_Banner));
-						//banner.IsBackground = true;
-						//banner.Start();
 					}
 					else
 					{
@@ -501,9 +501,6 @@ namespace DaRT
 				if (!pendingDatabase)
 				{
 					Task.Run(thread_Database);
-					//Thread thread = new Thread(new ThreadStart(thread_Database));
-					//thread.IsBackground = true;
-					//thread.Start();
 				}
 			}
 		}
@@ -530,7 +527,6 @@ namespace DaRT
 			setPlayerCount(0);
 			setAdminCount(0);
 			setBanCount(0);
-			banner.Image = GetImage("Please connect to a server...");
 
 			this.Log("Disconnected.", LogType.Console, false);
 
@@ -1199,7 +1195,8 @@ namespace DaRT
 				else if (AdminsTab.SelectedTab.Text == "Global Bans")
 				{
 					/*Task.Run(() => */
-					getGlobalBans();
+					Task.Run(getInfiStarBans);
+					Task.Run(GetWSBans);
 				}
 				else if (AdminsTab.SelectedTab.Text == "Player Database")
 				{
@@ -1284,76 +1281,6 @@ namespace DaRT
 			}
 		}
 
-		private void getGlobalBans()
-		{
-			if (GlobalBans == null || GlobalBans.Count < 1)
-			{
-				var option = "1";
-				GlobalBans = new List<InfiStarGlobalBan>();
-				try
-				{
-					this.Log("Started Loading Bans from InfiStar!" + Environment.NewLine, LogType.Console, false);
-					string str1 = "";
-					using (WebClient client = new WebClient())
-					{
-						string str = Guid.NewGuid().ToString().Replace("-", "");
-						ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072; //TLS 1.2
-						client.Encoding = Encoding.UTF8;
-						client.Headers.Add("user-agent", "infiSTAR RCON");
-						client.Headers.Set("cryptkey", str);
-						client.Headers.Add("version", string.Format("{0}", string.Format("[v{0} infiSTAR.de Update]", 256)));
-						client.Headers.Set("x01", this.EncryptString(this.MachineGuid(), str + "x01"));
-						client.Headers.Add(nameof(option), option);
-						str1 = client.DownloadString("http://brc.infistar.de/" + "dart.php");
-					}
-					string[] tmp = str1.Split('\n');
-					for (int i = 0; i < tmp.Length; i++)
-					{
-						if (tmp[i].Length > 0 && !String.IsNullOrEmpty(tmp[i]))
-							tmp[i] = tmp[i].Substring(0, tmp[i].LastIndexOf('|'));
-					}
-					foreach (string a in tmp)
-					{
-						if (!String.IsNullOrEmpty(a))
-						{
-							var b = a.Split('|');
-							if (b.Length > 1)
-								GlobalBans.Add(new InfiStarGlobalBan(b[0], b[1]));
-							else if (b.Length == 1)
-								GlobalBans.Add(new InfiStarGlobalBan(b[0]));
-							else
-								this.Log("FCK MY LIFE", LogType.Console, false);
-						}
-					}
-
-					//globalbanlist.Clear();
-					for (int i = 0; i < GlobalBans.Count; i++)
-					{
-						String[] items = { GlobalBans[i].guid, GlobalBans[i].uid };
-						ListViewItem item = new ListViewItem(items);
-						globalbanlist.Items.Add(item);
-					}
-					all.AppendText("Loaded " + GlobalBans.Count + " bans from InfiStar!"+Environment.NewLine);
-
-				}
-				catch (Exception e)
-				{
-					this.Log(e.Message, LogType.Console, false);
-					this.Log(e.StackTrace, LogType.Console, false);
-				}
-			}
-			else
-			{
-				//globalbanlist.Clear();
-				for (int i = 0; i < GlobalBans.Count; i++)
-				{
-					String[] items = { GlobalBans[i].guid, GlobalBans[i].uid };
-					ListViewItem item = new ListViewItem(items);
-					globalbanlist.Items.Add(item);
-				}
-				all.AppendText("Loaded " + GlobalBans.Count + " bans from InfiStar!" + Environment.NewLine);
-			}
-		}
 		public string MachineGuid()
 		{
 			string asd = "";
@@ -1406,6 +1333,169 @@ namespace DaRT
 		#endregion
 
 		#region Threads
+		private void GetWSBans()
+		{
+			if (this.loadingWSBans)
+				return;
+			this.loadingWSBans = true;
+			//if (!(DateTime.Now > this.WsBansDownloadTimeout))
+			Log("Loading bans from ws.arma.su.", LogType.Console, false);
+			try
+			{
+				string str1 = "";
+				string option = "";
+				using (WebClient client = new WebClient())
+				{
+					string str = Guid.NewGuid().ToString().Replace("-", "");
+					ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072; //TLS 1.2
+					client.Encoding = Encoding.UTF8;
+					client.Headers.Add("user-agent", "infiSTAR RCON");
+					client.Headers.Set("cryptkey", str);
+					client.Headers.Add("version", string.Format("{0}", string.Format("[v{0} infiSTAR.de Update]", 256)));
+					client.Headers.Set("x01", this.EncryptString(this.MachineGuid(), str + "x01"));
+					client.Headers.Add(nameof(option), option);
+					str1 = client.DownloadString("https://api.infistar.de/arma/wsbans");
+				}
+
+				this.ParseWSBansString(str1);
+			}
+			catch (Exception e)
+			{
+				this.Log(e.Message, LogType.Debug, false);
+			}
+		}
+
+		private void ParseWSBansString(string str)
+		{
+			try
+			{
+				int num = 0;
+				//GUImain.WSBansDict.Clear();
+				//string wsBansString = GUImain.wsBansString;
+				char[] chArray = new char[1] { '\n' };
+				foreach (string str1 in str.Split(chArray))
+				{
+					if (str1.Length >= 39)
+					{
+						string key = str1.Substring(0, 32);
+						var c = new GlobalBan(key);
+
+						if (!WSBans.Any(e => e == c))
+						{
+							WSBans.Add(c);
+						}
+
+					}
+				}
+				Debugger.Break();
+				this.Log((object)string.Format("Loaded {0} bans from ws.arma.su", (object)WSBans.Count), LogType.Console, false);
+			}
+			catch (Exception ex)
+			{
+				this.Log((object)("ParseWSBans: " + ex.Message), LogType.Debug, true);
+			}
+		}
+		private void getInfiStarBans()
+		{
+			if (this.loadinginfibans)
+				return;
+			if (InfiStarGlobalBans == null || InfiStarGlobalBans.Count < 1)
+			{
+				if (InfiStarGlobalBans == null)
+					InfiStarGlobalBans = new List<GlobalBan>();
+				using (SqliteCommand cmd = new SqliteCommand("Select * from GlobalBans", connection))
+				{
+					var reader = cmd.ExecuteReader();
+					while (reader.HasRows && reader.Read())
+					{
+						string guid = reader[1].ToString();
+						string uid = reader[0].ToString();
+						InfiStarGlobalBans.Add(new GlobalBan(uid, guid));
+					}
+				}
+
+				var option = "1";
+				try
+				{
+					this.Log("Started Loading Bans from InfiStar!" + Environment.NewLine, LogType.Console, false);
+					string str1 = "";
+					using (WebClient client = new WebClient())
+					{
+						string str = Guid.NewGuid().ToString().Replace("-", "");
+						ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072; //TLS 1.2
+						client.Encoding = Encoding.UTF8;
+						client.Headers.Add("user-agent", "infiSTAR RCON");
+						client.Headers.Set("cryptkey", str);
+						client.Headers.Add("version", string.Format("{0}", string.Format("[v{0} infiSTAR.de Update]", 256)));
+						client.Headers.Set("x01", this.EncryptString(this.MachineGuid(), str + "x01"));
+						client.Headers.Add(nameof(option), option);
+						str1 = client.DownloadString("http://brc.infistar.de/" + "dart.php");
+					}
+					string[] tmp = str1.Split('\n');
+					for (int i = 0; i < tmp.Length; i++)
+					{
+						if (tmp[i].Length > 0 && !String.IsNullOrEmpty(tmp[i]))
+							tmp[i] = tmp[i].Substring(0, tmp[i].LastIndexOf('|'));
+					}
+
+					foreach (string a in tmp)
+					{
+						if (!String.IsNullOrEmpty(a))
+						{
+							var b = a.Split('|');
+							var c = new GlobalBan(b[0], b[1]);
+							if (!InfiStarGlobalBans.Any(e => e == c))
+							{
+								InfiStarGlobalBans.Add(c);
+								using (SqliteCommand cmd = new SqliteCommand("INSERT INTO GlobalBans (guid, uid) values (@guid, @uid)", connection))
+								{
+									cmd.Parameters.Add(new SqliteParameter("@guid", b[0]));
+									cmd.Parameters.Add(new SqliteParameter("@uid", b[1]));
+									cmd.ExecuteNonQuery();
+								}
+							}
+						}
+					}
+
+					this.Invoke((MethodInvoker)delegate
+				   {
+					   //globalbanlist.Clear();
+					   for (int i = 0; i < InfiStarGlobalBans.Count; i++)
+					   {
+						   String[] items = { InfiStarGlobalBans[i].guid, InfiStarGlobalBans[i].uid };
+						   ListViewItem item = new ListViewItem(items);
+						   globalbanlist.Items.Add(item);
+					   }
+				   });
+					this.Invoke((MethodInvoker)delegate
+					{
+						all.AppendText("Loaded " + InfiStarGlobalBans.Count + " bans from InfiStar!" + Environment.NewLine);
+					});
+
+				}
+				catch (Exception e)
+				{
+					this.Log(e.Message, LogType.Console, false);
+					this.Log(e.StackTrace, LogType.Console, false);
+				}
+			}
+			else
+			{
+				//globalbanlist.Clear();
+				this.Invoke((MethodInvoker)delegate
+			   {
+
+				   for (int i = 0; i < InfiStarGlobalBans.Count; i++)
+				   {
+					   String[] items = { InfiStarGlobalBans[i].guid, InfiStarGlobalBans[i].uid };
+					   ListViewItem item = new ListViewItem(items);
+					   globalbanlist.Items.Add(item);
+				   }
+				   all.AppendText("Loaded " + InfiStarGlobalBans.Count + " bans from InfiStar!" + Environment.NewLine);
+			   });
+			}
+			loadinginfibans = false;
+		}
 		private void thread_Connect()
 		{
 			// Connect process is pending
@@ -1532,18 +1622,10 @@ namespace DaRT
 						if (Settings.Default.requestOnConnect && rcon.Connected)
 						{
 							Task.Run(thread_Player);
-							//Thread threadPlayer = new Thread(new ThreadStart(thread_Player));
-							//threadPlayer.IsBackground = true;
-							//threadPlayer.Start();
-							//Thread.Sleep(50);
+
 							Task.Run(thread_Bans);
-							//Thread threadBans = new Thread(new ThreadStart(thread_Bans));
-							//threadBans.IsBackground = true;
-							//threadBans.Start();
+
 							Task.Run(thread_Admins);
-							//Thread threadAdmins = new Thread(new ThreadStart(thread_Admins));
-							//threadAdmins.IsBackground = true;
-							//threadAdmins.Start();
 						}
 
 						// Setting maximum of refresh timer
@@ -2039,40 +2121,6 @@ namespace DaRT
 			});
 
 		}
-		private void thread_Banner()
-		{
-			try
-			{
-				banner.Invoke((MethodInvoker)delegate
-				{
-					banner.Image = GetImage("Downloading server banner...");
-				});
-				String ip = host.Text + ":" + port.Text;
-				String url = String.Format(Settings.Default.bannerImage, ip);
-
-				HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(url);
-				request.Proxy = proxy;
-				request.UserAgent = "Dart" + version;
-
-				using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
-				{
-					using (Stream stream = response.GetResponseStream())
-					{
-						Image image = Image.FromStream(stream);
-						banner.Invoke((MethodInvoker)delegate
-						{
-							banner.Image = image;
-						});
-					}
-				}
-			}
-			catch (Exception e)
-			{
-				this.Log(e.Message, LogType.Debug, false);
-				this.Log(e.StackTrace, LogType.Debug, false);
-				banner.Image = GetImage("Unable to get banner");
-			}
-		}
 
 		private void thread_News()
 		{
@@ -2445,7 +2493,8 @@ namespace DaRT
 				{
 					FlashWindow.Flash(this);
 				});
-				SystemSounds.Hand.Play();
+				for (int i = 0; i < 5; i++)
+					SystemSounds.Hand.Play();
 			}
 
 			// Save log to file if necessary
@@ -2526,7 +2575,7 @@ namespace DaRT
 
 				Color color = Color.Empty;
 				if (item.Type == LogType.Console)
-					color = this.GetColor("#000000");
+					color = (Program.UITextColor.color == Color.White) ? this.GetColor("#FFFFFF") : this.GetColor("#000000");
 
 				else if (item.Type == LogType.GlobalChat)
 					color = this.GetColor("#474747");
@@ -2805,9 +2854,10 @@ namespace DaRT
 					{
 						if (!pendingPlayers)
 						{
-							Thread threadPlayer = new Thread(new ThreadStart(thread_Player));
-							threadPlayer.IsBackground = true;
-							threadPlayer.Start();
+							Task.Run(thread_Player);
+							//Thread threadPlayer = new Thread(new ThreadStart(thread_Player));
+							//threadPlayer.IsBackground = true;
+							//threadPlayer.Start();
 						}
 					}
 				}
@@ -2855,6 +2905,10 @@ namespace DaRT
 
 		#region Konami
 		private UInt16 konami = 0;
+		private bool loadingWSBans = false;
+		private bool loadinginfibans = false;
+
+		public List<GlobalBan> WSBans = new List<GlobalBan>();
 		#endregion
 		private void GUI_KeyDown(object sender, KeyEventArgs args)
 		{
@@ -2868,21 +2922,13 @@ namespace DaRT
 					{
 						if (AdminsTab.SelectedTab.Text == "Players" && rcon.Connected && !pendingPlayers)
 						{
-							Thread thread = new Thread(new ThreadStart(thread_Player));
-							thread.IsBackground = true;
-							thread.Start();
-							Thread banner = new Thread(new ThreadStart(thread_Banner));
-							banner.IsBackground = true;
-							banner.Start();
+							Task.Run(thread_Player);
 						}
 						else if (AdminsTab.SelectedTab.Text == "Bans" && !pendingBans)
 						{
 							Thread thread = new Thread(new ThreadStart(thread_Bans));
 							thread.IsBackground = true;
 							thread.Start();
-							Thread banner = new Thread(new ThreadStart(thread_Banner));
-							banner.IsBackground = true;
-							banner.Start();
 						}
 					}
 					else
@@ -3358,8 +3404,6 @@ namespace DaRT
 			InitializeAdminsList();
 			InitializeFunctions();
 			InitializeConsole();
-
-			InitializeBanner();
 			InitializeProxy();
 
 			InitializeFonts();
@@ -3518,241 +3562,32 @@ namespace DaRT
 
 		private void searchButton_Click(object sender, EventArgs args)
 		{
-			if (searchButton.Text != "Clear")
+			try
 			{
-				if (search.Text != "")
-					searchButton.Text = "Clear";
-			}
-			else
-			{
-				search.Text = "";
-				searchButton.Text = "Search";
-			}
-
-			#region Players
-			if (AdminsTab.SelectedTab.Text == "Players")
-			{
-				if (search.Text != "")
+				if (searchButton.Text != "Clear")
 				{
-					playerList.Items.Clear();
-
-					for (int i = 0; i < players.Count; i++)
-					{
-						// Get comment for GUID
-						SqliteCommand commentCommand = new SqliteCommand(connection);
-						commentCommand.CommandText = "SELECT comment FROM comments WHERE guid = @guid";
-						commentCommand.Parameters.Add(new SqliteParameter("@guid", players[i].guid));
-
-						SqliteDataReader commentReader = commentCommand.ExecuteReader();
-
-						String comment = "";
-						if (commentReader.Read())
-							comment = this.GetSafeString(commentReader, 0);
-						commentReader.Close();
-						commentReader.Dispose();
-						commentCommand.Dispose();
-
-						String[] items = { "", players[i].number.ToString(), players[i].ip, players[i].ping, players[i].guid, players[i].name, players[i].status, comment };
-						ListViewItem item = new ListViewItem(items);
-						item.ImageIndex = i;
-
-						playerList.Items.Add(item);
-					}
-
-					List<ListViewItem> foundItems = new List<ListViewItem>();
-
-					foreach (ListViewItem item in playerList.Items)
-					{
-						if (filter.SelectedItem.ToString() == "Name")
-						{
-							if (item.SubItems[5].Text.ToLower().Contains(search.Text.ToLower()))
-							{
-								foundItems.Add(item);
-							}
-						}
-						else if (filter.SelectedItem.ToString() == "GUID")
-						{
-							if (item.SubItems[4].Text.ToLower().Contains(search.Text.ToLower()))
-							{
-								foundItems.Add(item);
-							}
-						}
-						else if (filter.SelectedItem.ToString() == "IP")
-						{
-							if (item.SubItems[2].Text.ToLower().Contains(search.Text.ToLower()))
-							{
-								foundItems.Add(item);
-							}
-						}
-						else if (filter.SelectedItem.ToString() == "Comment")
-						{
-							if (item.SubItems[7].Text.ToLower().Contains(search.Text.ToLower()))
-							{
-								foundItems.Add(item);
-							}
-						}
-					}
-
-					playerList.Items.Clear();
-
-					for (int i = 0; i < foundItems.Count; i++)
-					{
-						playerList.Items.Add(foundItems[i]);
-					}
-
+					if (search.Text != "")
+						searchButton.Text = "Clear";
 				}
 				else
 				{
-					playerList.Items.Clear();
-
-					for (int i = 0; i < players.Count; i++)
-					{
-						// Get comment for GUID
-						SqliteCommand commentCommand = new SqliteCommand(connection);
-						commentCommand.CommandText = "SELECT comment FROM comments WHERE guid = @guid";
-						commentCommand.Parameters.Add(new SqliteParameter("@guid", players[i].guid));
-
-						SqliteDataReader commentReader = commentCommand.ExecuteReader();
-
-						String comment = "";
-						if (commentReader.Read())
-							comment = this.GetSafeString(commentReader, 0);
-						commentReader.Close();
-						commentReader.Dispose();
-						commentCommand.Dispose();
-
-						String[] items = { "", players[i].number.ToString(), players[i].ip, players[i].ping, players[i].guid, players[i].name, players[i].status, comment };
-						ListViewItem item = new ListViewItem(items);
-						item.ImageIndex = i;
-
-						playerList.Items.Add(item);
-					}
+					search.Text = "";
+					searchButton.Text = "Search";
 				}
-			}
-			#endregion
-			#region Bans
-			if (AdminsTab.SelectedTab.Text == "Bans")
-			{
-				if (search.Text != "")
+
+				#region Players
+				if (AdminsTab.SelectedTab.Text == "Players")
 				{
-					bansCache.Clear();
-
-					for (int i = 0; i < bans.Count; i++)
+					if (search.Text != "")
 					{
-						// Get comment for GUID
-						String comment = "";
-						if (bans[i].ipguid.Length == 32)
+						playerList.Items.Clear();
+
+						for (int i = 0; i < players.Count; i++)
 						{
-							// Get comment for GUID
-							using (command = new SqliteCommand("SELECT comment FROM comments WHERE guid = @guid", connection))
-							{
-								command.Parameters.Add(new SqliteParameter("@guid", bans[i].ipguid));
-
-								using (SqliteDataReader reader = command.ExecuteReader())
-								{
-									if (reader.Read())
-										comment = this.GetSafeString(reader, 0);
-								}
-							}
-						}
-
-						String[] items = { bans[i].number, bans[i].ipguid, bans[i].time, bans[i].reason, comment };
-						ListViewItem item = new ListViewItem(items);
-
-						bansCache.Add(item);
-					}
-
-					List<ListViewItem> foundItems = new List<ListViewItem>();
-
-					foreach (ListViewItem item in bansCache)
-					{
-						if (item.SubItems[1].Text.ToLower().Contains(search.Text.ToLower()))
-						{
-							foundItems.Add(item);
-						}
-						else if (filter.SelectedItem.ToString() == "Reason")
-						{
-							if (item.SubItems[3].Text.ToLower().Contains(search.Text.ToLower()))
-							{
-								foundItems.Add(item);
-							}
-						}
-						else if (filter.SelectedItem.ToString() == "Comment")
-						{
-							if (item.SubItems[4].Text.ToLower().Contains(search.Text.ToLower()))
-							{
-								foundItems.Add(item);
-							}
-						}
-					}
-
-					bansList.VirtualListSize = foundItems.Count;
-					bansCache.Clear();
-
-					for (int i = 0; i < foundItems.Count; i++)
-					{
-						bansCache.Add(foundItems[i]);
-					}
-				}
-				else
-				{
-					bansList.VirtualListSize = bans.Count;
-					bansCache.Clear();
-
-					for (int i = 0; i < bans.Count; i++)
-					{
-						// Get comment for GUID
-						String comment = "";
-						if (bans[i].ipguid.Length == 32)
-						{
-							// Get comment for GUID
-							using (command = new SqliteCommand("SELECT comment FROM comments WHERE guid = @guid", connection))
-							{
-								command.Parameters.Add(new SqliteParameter("@guid", bans[i].ipguid));
-
-								using (SqliteDataReader reader = command.ExecuteReader())
-								{
-									if (reader.Read())
-										comment = this.GetSafeString(reader, 0);
-								}
-							}
-						}
-
-						String[] items = { bans[i].number, bans[i].ipguid, bans[i].time, bans[i].reason, comment };
-						ListViewItem item = new ListViewItem(items);
-
-						bansCache.Add(item);
-					}
-				}
-			}
-			#endregion
-			#region Player Database
-			else if (AdminsTab.SelectedTab.Text == "Player Database")
-			{
-				if (search.Text != "")
-				{
-					try
-					{
-						command = new SqliteCommand(connection);
-
-						command.CommandText = "SELECT id, lastip, lastseen, guid, name, lastseenon, uid FROM players ORDER BY id ASC";
-
-						SqliteDataReader reader = command.ExecuteReader();
-
-						List<Player> playersDB = new List<Player>();
-						while (reader.Read())
-						{
-							int id = reader.GetInt32(0);
-							String lastip = this.GetSafeString(reader, 1);
-							String lastseen = this.GetSafeString(reader, 2);
-							String guid = this.GetSafeString(reader, 3);
-							String name = this.GetSafeString(reader, 4);
-							String lastseenon = this.GetSafeString(reader, 5);
-							string uid = GetSafeString(reader, 6);
 							// Get comment for GUID
 							SqliteCommand commentCommand = new SqliteCommand(connection);
 							commentCommand.CommandText = "SELECT comment FROM comments WHERE guid = @guid";
-							commentCommand.Parameters.Add(new SqliteParameter("@guid", guid));
+							commentCommand.Parameters.Add(new SqliteParameter("@guid", players[i].guid));
 
 							SqliteDataReader commentReader = commentCommand.ExecuteReader();
 
@@ -3763,124 +3598,364 @@ namespace DaRT
 							commentReader.Dispose();
 							commentCommand.Dispose();
 
-							playersDB.Add(new Player(id, lastip, lastseen, guid, name, lastseenon, comment, true, uid));
-						}
-						reader.Close();
-						reader.Dispose();
-						command.Dispose();
-
-						dbCache.Clear();
-						for (int i = 0; i < playersDB.Count; i++)
-						{
-							String[] items = { playersDB[i].number.ToString(), playersDB[i].ip, playersDB[i].lastseen, playersDB[i].guid, playersDB[i].name, playersDB[i].lastseenon, playersDB[i].comment };
+							String[] items = { "", players[i].number.ToString(), players[i].ip, players[i].ping, players[i].guid, players[i].name, players[i].status, comment };
 							ListViewItem item = new ListViewItem(items);
-							dbCache.Add(item);
+							item.ImageIndex = i;
+
+							playerList.Items.Add(item);
 						}
-						playerDBList.VirtualListSize = playersDB.Count;
-					}
-					catch (Exception e)
-					{
-						this.Log(e.Message, LogType.Debug, false);
-						this.Log(e.StackTrace, LogType.Debug, false);
-					}
 
-					List<ListViewItem> foundItems = new List<ListViewItem>();
+						List<ListViewItem> foundItems = new List<ListViewItem>();
 
-					foreach (ListViewItem item in dbCache)
-					{
-						if (filter.SelectedItem.ToString() == "Name")
+						foreach (ListViewItem item in playerList.Items)
 						{
-							if (item.SubItems[4].Text.ToLower().Contains(search.Text.ToLower()))
+							if (filter.SelectedItem.ToString() == "Name")
 							{
-								foundItems.Add(item);
+								if (item.SubItems[5].Text.ToLower().Contains(search.Text.ToLower()))
+								{
+									foundItems.Add(item);
+								}
+							}
+							else if (filter.SelectedItem.ToString() == "GUID")
+							{
+								if (item.SubItems[4].Text.ToLower().Contains(search.Text.ToLower()))
+								{
+									foundItems.Add(item);
+								}
+							}
+							else if (filter.SelectedItem.ToString() == "IP")
+							{
+								if (item.SubItems[2].Text.ToLower().Contains(search.Text.ToLower()))
+								{
+									foundItems.Add(item);
+								}
+							}
+							else if (filter.SelectedItem.ToString() == "Comment")
+							{
+								if (item.SubItems[7].Text.ToLower().Contains(search.Text.ToLower()))
+								{
+									foundItems.Add(item);
+								}
 							}
 						}
-						else if (filter.SelectedItem.ToString() == "GUID")
+
+						playerList.Items.Clear();
+
+						for (int i = 0; i < foundItems.Count; i++)
 						{
-							if (item.SubItems[3].Text.ToLower().Contains(search.Text.ToLower()))
-							{
-								foundItems.Add(item);
-							}
+							playerList.Items.Add(foundItems[i]);
 						}
-						else if (filter.SelectedItem.ToString() == "IP")
+
+					}
+					else
+					{
+						playerList.Items.Clear();
+
+						for (int i = 0; i < players.Count; i++)
+						{
+							// Get comment for GUID
+							SqliteCommand commentCommand = new SqliteCommand(connection);
+							commentCommand.CommandText = "SELECT comment FROM comments WHERE guid = @guid";
+							commentCommand.Parameters.Add(new SqliteParameter("@guid", players[i].guid));
+
+							SqliteDataReader commentReader = commentCommand.ExecuteReader();
+
+							String comment = "";
+							if (commentReader.Read())
+								comment = this.GetSafeString(commentReader, 0);
+							commentReader.Close();
+							commentReader.Dispose();
+							commentCommand.Dispose();
+
+							String[] items = { "", players[i].number.ToString(), players[i].ip, players[i].ping, players[i].guid, players[i].name, players[i].status, comment };
+							ListViewItem item = new ListViewItem(items);
+							item.ImageIndex = i;
+
+							playerList.Items.Add(item);
+						}
+					}
+				}
+				#endregion
+				#region Bans
+				if (AdminsTab.SelectedTab.Text == "Bans")
+				{
+					if (search.Text != "")
+					{
+						bansCache.Clear();
+
+						for (int i = 0; i < bans.Count; i++)
+						{
+							// Get comment for GUID
+							String comment = "";
+							if (bans[i].ipguid.Length == 32)
+							{
+								// Get comment for GUID
+								using (command = new SqliteCommand("SELECT comment FROM comments WHERE guid = @guid", connection))
+								{
+									command.Parameters.Add(new SqliteParameter("@guid", bans[i].ipguid));
+
+									using (SqliteDataReader reader = command.ExecuteReader())
+									{
+										if (reader.Read())
+											comment = this.GetSafeString(reader, 0);
+									}
+								}
+							}
+
+							String[] items = { bans[i].number, bans[i].ipguid, bans[i].time, bans[i].reason, comment };
+							ListViewItem item = new ListViewItem(items);
+
+							bansCache.Add(item);
+						}
+
+						List<ListViewItem> foundItems = new List<ListViewItem>();
+
+						foreach (ListViewItem item in bansCache)
 						{
 							if (item.SubItems[1].Text.ToLower().Contains(search.Text.ToLower()))
 							{
 								foundItems.Add(item);
 							}
-						}
-						else if (filter.SelectedItem.ToString() == "Comment")
-						{
-							if (item.SubItems[6].Text.ToLower().Contains(search.Text.ToLower()))
+							else if (filter.SelectedItem.ToString() == "Reason")
 							{
-								foundItems.Add(item);
+								if (item.SubItems[3].Text.ToLower().Contains(search.Text.ToLower()))
+								{
+									foundItems.Add(item);
+								}
+							}
+							else if (filter.SelectedItem.ToString() == "Comment")
+							{
+								if (item.SubItems[4].Text.ToLower().Contains(search.Text.ToLower()))
+								{
+									foundItems.Add(item);
+								}
 							}
 						}
-					}
 
-					dbCache.Clear();
+						bansList.VirtualListSize = foundItems.Count;
+						bansCache.Clear();
 
-					for (int i = 0; i < foundItems.Count; i++)
-					{
-						dbCache.Add(foundItems[i]);
-					}
-					playerDBList.VirtualListSize = foundItems.Count;
-				}
-				else
-				{
-					try
-					{
-						command = new SqliteCommand(connection);
-
-						command.CommandText = "SELECT id, lastip, lastseen, guid, name, lastseenon FROM players ORDER BY id ASC";
-
-						SqliteDataReader reader = command.ExecuteReader();
-
-						List<Player> playersDB = new List<Player>();
-						while (reader.Read())
+						for (int i = 0; i < foundItems.Count; i++)
 						{
-							int id = reader.GetInt32(0);
-							String lastip = this.GetSafeString(reader, 1);
-							String lastseen = this.GetSafeString(reader, 2);
-							String guid = this.GetSafeString(reader, 3);
-							String name = this.GetSafeString(reader, 4);
-							String lastseenon = this.GetSafeString(reader, 5);
+							bansCache.Add(foundItems[i]);
+						}
+					}
+					else
+					{
+						bansList.VirtualListSize = bans.Count;
+						bansCache.Clear();
 
+						for (int i = 0; i < bans.Count; i++)
+						{
 							// Get comment for GUID
-							SqliteCommand commentCommand = new SqliteCommand(connection);
-							commentCommand.CommandText = "SELECT comment FROM comments WHERE guid = @guid";
-							commentCommand.Parameters.Add(new SqliteParameter("@guid", guid));
-
-							SqliteDataReader commentReader = commentCommand.ExecuteReader();
-
 							String comment = "";
-							if (commentReader.Read())
-								comment = this.GetSafeString(commentReader, 0);
-							commentReader.Close();
-							commentReader.Dispose();
-							commentCommand.Dispose();
+							if (bans[i].ipguid.Length == 32)
+							{
+								// Get comment for GUID
+								using (command = new SqliteCommand("SELECT comment FROM comments WHERE guid = @guid", connection))
+								{
+									command.Parameters.Add(new SqliteParameter("@guid", bans[i].ipguid));
 
-							playersDB.Add(new Player(id, lastip, lastseen, guid, name, lastseenon, comment, true));
-						}
-						command.Dispose();
+									using (SqliteDataReader reader = command.ExecuteReader())
+									{
+										if (reader.Read())
+											comment = this.GetSafeString(reader, 0);
+									}
+								}
+							}
 
-						dbCache.Clear();
-						for (int i = 0; i < playersDB.Count; i++)
-						{
-							String[] items = { playersDB[i].number.ToString(), playersDB[i].ip, playersDB[i].lastseen, playersDB[i].guid, playersDB[i].name, playersDB[i].lastseenon, playersDB[i].comment };
+							String[] items = { bans[i].number, bans[i].ipguid, bans[i].time, bans[i].reason, comment };
 							ListViewItem item = new ListViewItem(items);
-							dbCache.Add(item);
+
+							bansCache.Add(item);
 						}
-						playerDBList.VirtualListSize = playersDB.Count;
-					}
-					catch (Exception e)
-					{
-						this.Log(e.Message, LogType.Debug, false);
-						this.Log(e.StackTrace, LogType.Debug, false);
 					}
 				}
+				#endregion
+				#region Player Database
+				else if (AdminsTab.SelectedTab.Text == "Player Database")
+				{
+					if (search.Text != "")
+					{
+						try
+						{
+							List<Player> playersDB = new List<Player>();
+							using (command = new SqliteCommand(connection))
+							{
+								command.CommandText = "SELECT id, lastip, lastseen, guid, name, lastseenon, uid FROM players ORDER BY id ASC";
+
+								using (SqliteDataReader reader = command.ExecuteReader())
+								{
+
+									while (reader.Read())
+									{
+										int id = reader.GetInt32(0);
+										String lastip = this.GetSafeString(reader, 1);
+										String lastseen = this.GetSafeString(reader, 2);
+										String guid = this.GetSafeString(reader, 3);
+										String name = this.GetSafeString(reader, 4);
+										String lastseenon = this.GetSafeString(reader, 5);
+										string uid = GetSafeString(reader, 6);
+										String comment = "";
+										// Get comment for GUID
+										using (SqliteCommand commentCommand = new SqliteCommand(connection))
+										{
+
+											commentCommand.CommandText = "SELECT comment FROM comments WHERE guid = @guid";
+											commentCommand.Parameters.Add(new SqliteParameter("@guid", guid));
+
+											using (SqliteDataReader commentReader = commentCommand.ExecuteReader())
+											{
+
+
+												if (commentReader.Read())
+													comment = this.GetSafeString(commentReader, 0);
+											}
+										}
+										playersDB.Add(new Player(id, lastip, lastseen, guid, name, lastseenon, comment, true, uid));
+									}
+								}
+
+								dbCache.Clear();
+								for (int i = 0; i < playersDB.Count; i++)
+								{
+									String[] items = { playersDB[i].number.ToString(), playersDB[i].ip, playersDB[i].lastseen, playersDB[i].guid, playersDB[i].uid, playersDB[i].name, playersDB[i].lastseenon, playersDB[i].comment };
+									ListViewItem item = new ListViewItem(items);
+									dbCache.Add(item);
+								}
+								playerDBList.VirtualListSize = playersDB.Count;
+							}
+						}
+						catch (Exception e)
+						{
+							Debugger.Break();
+							this.Log(e.Message, LogType.Debug, false);
+							this.Log(e.StackTrace, LogType.Debug, false);
+						}
+
+						try
+						{
+							List<ListViewItem> foundItems = new List<ListViewItem>();
+
+							foreach (ListViewItem item in dbCache)
+							{
+								if (filter.SelectedItem.ToString() == "Name")
+								{
+									if (item.SubItems[5].Text.ToLower().Contains(search.Text.ToLower()))
+									{
+										foundItems.Add(item);
+									}
+								}
+								else if (filter.SelectedItem.ToString() == "GUID")
+								{
+									if (item.SubItems[3].Text.ToLower().Contains(search.Text.ToLower()))
+									{
+										foundItems.Add(item);
+									}
+								}
+								else if (filter.SelectedItem.ToString() == "IP")
+								{
+									if (item.SubItems[1].Text.ToLower().Contains(search.Text.ToLower()))
+									{
+										foundItems.Add(item);
+									}
+								}
+								else if (filter.SelectedItem.ToString() == "Comment")
+								{
+									if (item.SubItems[7].Text.ToLower().Contains(search.Text.ToLower()))
+									{
+										foundItems.Add(item);
+									}
+								}
+								else if (filter.SelectedItem.ToString() == "UID")
+								{
+									if (item.SubItems[4].Text.ToLower().Contains(search.Text.ToLower()))
+									{
+										foundItems.Add(item);
+									}
+								}
+							}
+
+							dbCache.Clear();
+
+							for (int i = 0; i < foundItems.Count; i++)
+							{
+								dbCache.Add(foundItems[i]);
+							}
+							playerDBList.VirtualListSize = foundItems.Count;
+						}
+						catch (Exception e)
+						{
+							this.Log(e.Message, LogType.Debug, false);
+							this.Log(e.StackTrace, LogType.Debug, false);
+							Debugger.Break();
+						}
+					}
+					else
+					{
+						try
+						{
+							List<Player> playersDB = new List<Player>();
+							using (command = new SqliteCommand(connection))
+							{
+								command.CommandText = "SELECT id, lastip, lastseen, guid, name, lastseenon, uid FROM players ORDER BY id ASC";
+
+								SqliteDataReader reader = command.ExecuteReader();
+
+
+								while (reader.Read())
+								{
+									int id = reader.GetInt32(0);
+									String lastip = this.GetSafeString(reader, 1);
+									String lastseen = this.GetSafeString(reader, 2);
+									String guid = this.GetSafeString(reader, 3);
+									String name = this.GetSafeString(reader, 4);
+									String lastseenon = this.GetSafeString(reader, 5);
+									string uid = this.GetSafeString(reader, 6);
+									//Debugger.Break();
+									String comment = "";
+									// Get comment for GUID
+									using (SqliteCommand commentCommand = new SqliteCommand(connection))
+									{
+										commentCommand.CommandText = "SELECT comment FROM comments WHERE guid = @guid";
+										commentCommand.Parameters.Add(new SqliteParameter("@guid", guid));
+
+										using (SqliteDataReader commentReader = commentCommand.ExecuteReader())
+										{
+
+											if (commentReader.Read())
+												comment = this.GetSafeString(commentReader, 0);
+										}
+									}
+									playersDB.Add(new Player(id, lastip, lastseen, guid, name, lastseenon, comment, true, uid));
+								}
+							}
+							dbCache.Clear();
+							for (int i = 0; i < playersDB.Count; i++)
+							{
+								String[] items = { playersDB[i].number.ToString(), playersDB[i].ip, playersDB[i].lastseen, playersDB[i].guid, playersDB[i].uid, playersDB[i].name, playersDB[i].lastseenon, playersDB[i].comment };
+								ListViewItem item = new ListViewItem(items);
+								dbCache.Add(item);
+							}
+							playerDBList.VirtualListSize = playersDB.Count;
+						}
+						catch (Exception e)
+						{
+							Debugger.Break();
+							this.Log(e.Message, LogType.Debug, false);
+							this.Log(e.StackTrace, LogType.Debug, false);
+						}
+					}
+				}
+				#endregion
 			}
-			#endregion
+			catch (Exception e)
+			{
+				this.Log(e.Message, LogType.Debug, false);
+				this.Log(e.StackTrace, LogType.Debug, false);
+				Debugger.Break();
+
+			}
 		}
 		private void bansList_RetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs args)
 		{
@@ -3923,7 +3998,7 @@ namespace DaRT
 				else
 				{
 					playerDBList.VirtualListSize = dbCache.Count;
-					String[] items = { "", "", "", "", "", "", "" };
+					String[] items = { "", "", "", "", "", "", "", "" };
 					args.Item = new ListViewItem(items);
 				}
 			}

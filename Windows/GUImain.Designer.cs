@@ -71,7 +71,7 @@ namespace DaRT
 			this.filter = new System.Windows.Forms.ComboBox();
 			this.searchLabel = new System.Windows.Forms.Label();
 			this.input = new System.Windows.Forms.TextBox();
-			this.banner = new System.Windows.Forms.PictureBox();
+			//this.banner = new System.Windows.Forms.PictureBox();
 			this.options = new System.Windows.Forms.ComboBox();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
 			this.splitContainer1.Panel1.SuspendLayout();
@@ -92,7 +92,7 @@ namespace DaRT
 			this.tabConsole.SuspendLayout();
 			this.tabChat.SuspendLayout();
 			this.tabLog.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.banner)).BeginInit();
+			//((System.ComponentModel.ISupportInitialize)(this.banner)).BeginInit();
 			this.SuspendLayout();
 			#endregion
 
@@ -156,6 +156,7 @@ namespace DaRT
 			this.hosts.TabIndex = 22;
 			this.hosts.Text = "Load Servers";
 			this.hosts.UseVisualStyleBackColor = true;
+			this.hosts.Click += new System.EventHandler(this.hosts_Click);
 			// 
 			// execute
 			// 
@@ -302,14 +303,13 @@ namespace DaRT
 			this.splitContainer2.Panel2.Controls.Add(this.filter);
 			this.splitContainer2.Panel2.Controls.Add(this.searchLabel);
 			this.splitContainer2.Panel2.Controls.Add(this.input);
-			this.splitContainer2.Panel2.Controls.Add(this.banner);
 			this.splitContainer2.Panel2.Controls.Add(this.options);
 			this.splitContainer2.Panel2MinSize = 50;
 			this.splitContainer2.Size = new System.Drawing.Size(1087, 571);
 			this.splitContainer2.SplitterDistance = 329;
 			this.splitContainer2.TabIndex = 21;
 			#endregion
-			
+
 			#region Tabs and Pages
 			// AdminsTab
 			// 
@@ -538,7 +538,7 @@ namespace DaRT
 			this.allowMessages.UseVisualStyleBackColor = true;
 			this.allowMessages.CheckedChanged += new System.EventHandler(this.autoScroll_CheckedChanged);
 			#endregion
-			
+
 			#region More tabs, chat, logs 
 			// logTabs
 			// 
@@ -657,7 +657,7 @@ namespace DaRT
 			this.logs.Text = "";
 			this.logs.MouseDown += new System.Windows.Forms.MouseEventHandler(this.console_MouseDown);
 			#endregion
-			 
+
 			#region Other stuff search filter
 			this.search.Location = new System.Drawing.Point(196, 1);
 			this.search.Name = "search";
@@ -730,9 +730,9 @@ namespace DaRT
 			this.input.Size = new System.Drawing.Size(898, 22);
 			this.input.TabIndex = 2;
 			this.input.TextChanged += new System.EventHandler(this.input_TextChanged);
-			this.input.KeyDown += new System.Windows.Forms.KeyEventHandler(this.input_KeyDown); 
-			
-		
+			this.input.KeyDown += new System.Windows.Forms.KeyEventHandler(this.input_KeyDown);
+
+
 			// options
 			// 
 			this.options.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
@@ -787,7 +787,7 @@ namespace DaRT
 			this.tabConsole.ResumeLayout(false);
 			this.tabChat.ResumeLayout(false);
 			this.tabLog.ResumeLayout(false);
-			((System.ComponentModel.ISupportInitialize)(this.banner)).EndInit();
+			//((System.ComponentModel.ISupportInitialize)(this.banner)).EndInit();
 			this.ResumeLayout(false);
 			#endregion
 
@@ -874,7 +874,10 @@ namespace DaRT
 			this.globalbans.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
 			this.globalbanlist.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
 			this.globalbanlist.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
-
+			this.splitContainer2.Panel1.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.splitContainer2.Panel1.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.splitContainer2.Panel2.DataBindings.Add(new Binding("BackColor", Program.UIBackGroundColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
+			this.splitContainer2.Panel2.DataBindings.Add(new Binding("ForeColor", Program.UITextColor, "color", false, DataSourceUpdateMode.OnPropertyChanged));
 			#endregion
 		}
 		#endregion
@@ -887,7 +890,6 @@ namespace DaRT
 		private System.Windows.Forms.Button disconnect;
 		private System.Windows.Forms.TextBox input;
 		private System.Windows.Forms.Button refresh;
-		private System.Windows.Forms.PictureBox banner;
 		private System.Windows.Forms.ComboBox options;
 		private System.Windows.Forms.Label lastRefresh;
 		private System.Windows.Forms.Label searchLabel;

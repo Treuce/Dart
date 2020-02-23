@@ -80,21 +80,29 @@ namespace DaRT
 			
 			if (args.Length == 0)
 			{
-				if (Debugger.IsAttached)
+				try
 				{
+					if (Debugger.IsAttached)
+					{
+						Application.EnableVisualStyles();
+						Application.SetCompatibleTextRenderingDefault(false);
+						gui = new GUImain(version);
+						Application.Run(gui);
+						return;
+					}
+					Application.ThreadException += CatchThreadException;
+					AppDomain.CurrentDomain.UnhandledException += CatchUnhandledException;
+
 					Application.EnableVisualStyles();
 					Application.SetCompatibleTextRenderingDefault(false);
 					gui = new GUImain(version);
 					Application.Run(gui);
-					return;
 				}
-				Application.ThreadException += CatchThreadException;
-				AppDomain.CurrentDomain.UnhandledException += CatchUnhandledException;
+				catch (Exception e)
+				{
 
-				Application.EnableVisualStyles();
-				Application.SetCompatibleTextRenderingDefault(false);
-				gui = new GUImain(version);
-				Application.Run(gui);
+					Debugger.Break();
+				}
 			}
 			else
 			{

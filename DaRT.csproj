@@ -124,7 +124,7 @@
     <Compile Include="Classes\Ban.cs" />
     <Compile Include="Classes\BanIP.cs" />
     <Compile Include="Classes\BanOffline.cs" />
-    <Compile Include="Classes\InfiStarGlobalBan.cs" />
+    <Compile Include="Classes\GlobalBan.cs" />
     <Compile Include="Classes\LogItem.cs" />
     <Compile Include="Enums\LogTypes.cs" />
     <Compile Include="Helpers\ColumnSorter.cs" />
